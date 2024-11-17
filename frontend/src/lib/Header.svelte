@@ -109,8 +109,8 @@
   }
 
   .logoTitle img{
-    width: 65px;
-    height: 65px;
+    width: 60px;
+    height: 60px;
   }
   .logoTitle{
     display: flex;
@@ -123,7 +123,7 @@
   .logoTitle > h2{
     font-weight: 600;
     font-family: Rubik;
-    font-size: 36px;
+    font-size: 30px;
     font-weight: 500;
     line-height: 42.66px;
     text-align: left;
@@ -173,7 +173,6 @@
     flex-wrap: wrap;
     font-size: clamp(15px,1vw,20px);
     font-weight: 350;
-    margin-right: 10px;
   }
 
   .tools{
@@ -219,6 +218,12 @@
       width: 30px;
       height: 30px;
       cursor: pointer;
+  }
+
+  @media(max-width:1200px) {
+    .toolsV2 {
+        margin-right: 10px;
+    }
   }
 
   @media(max-width:721px){

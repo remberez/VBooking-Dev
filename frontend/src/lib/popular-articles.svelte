@@ -18,12 +18,10 @@
 <style>
     section {
         display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        padding: 10px 0; 
-        justify-content: center;
+        padding: 10px 0;
         align-items: center;
-
+        justify-content: space-between;
+        gap: 10px;
     }
 
     a:hover {
@@ -45,7 +43,6 @@
         font-weight: 500;
         line-height: 23.7px;
         transition: 0.3s;
-        margin-left: 10px;
     }
 
     h1 {
@@ -60,5 +57,12 @@
         width: 100%;
         display: flex;
         flex-direction: column;
+    }
+
+    @media(max-width: 1200px) {
+        section {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
     }
 </style>

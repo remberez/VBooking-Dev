@@ -15,7 +15,6 @@
 
 <style>
     main {
-        width: 283px;
         border-radius: 10px;
         display: flex;
         flex-direction: column;
@@ -28,7 +27,6 @@
         padding: 0 10px 10px 10px;
         display: flex;
         gap: 10px;
-        width: 283px;
         flex-direction: column;
     }
 
@@ -42,8 +40,6 @@
 
     img {
         border-radius: 10px 10px 0 0;
-        height: 250px;
-        width: 283px;
     }
 
     h1 {
@@ -52,5 +48,17 @@
         font-weight: 400;
         line-height: 18.96px;
         text-align: left;
+    }
+
+    @media(max-width: 1200px) {
+        main {
+            width: 48%;
+        }
+    }
+
+    @media(max-width: 500px) {
+        main {
+            width: 100%;
+        }
     }
 </style>

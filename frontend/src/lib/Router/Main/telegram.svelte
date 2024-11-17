@@ -37,7 +37,7 @@
         width: 126px;
         height: 123px;
         -webkit-filter: drop-shadow(5px 5px 5px #222);
-        filter: drop-shadow(5px 5px 5px #222);
+        filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.25));
     }
 
     .info{
@@ -58,7 +58,6 @@
         text-align: left;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-
     }
 
     .info p{
@@ -68,7 +67,6 @@
         line-height: 23.7px;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-
     }
 
     .info a{
