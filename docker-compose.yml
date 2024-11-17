@@ -64,5 +64,16 @@ services:
     depends_on:
       - redis
     container_name: celery
+  svelte:
+    build:
+      context: frontend/
+    container_name: svelte
+    ports:
+      - "4173:4173"  # Порт, на котором будет доступно приложение Svelte
+    depends_on:
+      - django  # Если необходимо, можете указать зависимости
+    volumes:
+      - ./frontend:/usr/src/app/frontend  # Монтирование локальной директории для разработки
+
 volumes:
   pgdbdata: null
