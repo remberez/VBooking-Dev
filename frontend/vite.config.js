@@ -10,6 +10,9 @@ export default defineConfig({
         },
         host: true, // needed for the DC port mapping to work
         strictPort: true,
-        port: 5173
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+        },
     }
 })
