@@ -46,7 +46,7 @@
     <Route path='/search'>
       <div class="block">
         <Loader/>
-        <Search/>         
+        <Search/>
       </div>
 
     </Route>
