@@ -3,7 +3,7 @@ FROM node:18 as build
 ENV NODE_ENV=production
 
 
-WORKDIR /app
+WORKDIR /usr/src/app/frontend
 
 COPY package.json ./
 COPY package-lock.json ./
@@ -19,10 +19,11 @@ RUN npm run build
 
 FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app/frontend/
 COPY --from=build /app .
 
 
 ENV HOST=0.0.0.0
 EXPOSE 4173
-CMD ["npm","run", "preview","--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev"]
+# CMD ["npm","run", "preview","--", "--host", "0.0.0.0"]

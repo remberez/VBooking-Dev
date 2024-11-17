@@ -138,6 +138,7 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    padding: 10px 0;
   }
 
   a{

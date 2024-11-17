@@ -28,7 +28,7 @@
 
     
       <Route path="">
-        <div class="mass">
+        <div class="mass two">
           <Header/>
         </div>
         <MainPhoto/>
