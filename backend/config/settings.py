@@ -181,6 +181,7 @@ MEDIA_URL = 'media/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4173",
+    "http://localhost:5173",
 ]
 
 EMAIL_HOST = 'smtp.yandex.ru'
