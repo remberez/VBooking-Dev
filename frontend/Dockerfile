@@ -8,7 +8,12 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install
-COPY . ./
+
+RUN chmod +x ./node_modules/@esbuild/linux-x64/bin/esbuild
+
+COPY . .
+
+RUN chmod +x ./node_modules/.bin/vite
 RUN npm run build
 
 
