@@ -188,3 +188,5 @@ fabric.properties
 string_counter.py
 django.env
 db.sqlite3
+
+media/

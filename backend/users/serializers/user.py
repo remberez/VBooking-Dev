@@ -195,3 +195,43 @@ class ChangePositionSerializer(serializers.ModelSerializer):
         instance.position = validated_data.get('position', instance.position)
         instance.save()
         return instance
+
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True)
+    old_password2 = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'old_password',
+            'old_password2',
+            'new_password',
+        )
+
+    def password_validate(self, old_password, old_password2):
+        user = self.context.get('request').user
+        if old_password != old_password2:
+            print(old_password, old_password2)
+            raise exceptions.ParseError('Неверные пароли')
+
+        if not user.check_password(old_password):
+            raise ParseError('Текущий пароль неверен')
+
+    def update(self, instance, validated_data):
+        user = self.context.get('request').user
+        new_password = validated_data.get('new_password')
+        old_password = validated_data.get('old_password')
+        old_password2 = validated_data.get('old_password2')
+
+        self.password_validate(old_password, old_password2)
+
+        try:
+            validate_password(new_password)
+        except django_exceptions.ValidationError as e:
+            raise ParseError(e)
+
+        user.set_password(new_password)
+        user.save()
+        return instance

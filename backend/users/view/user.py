@@ -78,6 +78,10 @@ User = get_user_model()
     users_travelers=extend_schema(
         summary='Получить список всех пользователей с их попутчиками',
         tags=['Пользователи: попутчики']
+    ),
+    change_password=extend_schema(
+        summary='Поменять пароль',
+        tags=['Пользователи']
     )
 )
 class UserView(CRUDViewSet):
@@ -92,6 +96,7 @@ class UserView(CRUDViewSet):
         'set_image': user_serializers.SetImageUserSerializer,
         'change_position': user_serializers.ChangePositionSerializer,
         'users_travelers': traveler_serializers.UserTravelersSerializer,
+        'change_password': user_serializers.ChangePasswordSerializer,
     }
     multi_permission_classes = {
         'create': (AllowAny,),
@@ -103,6 +108,7 @@ class UserView(CRUDViewSet):
         'activate_email': (permissions.IsAuthenticated,),
         'set_image': (custom_permissions.IsOwnerOfAccount | custom_permissions.IsAdmin,),
         'change_position': (custom_permissions.IsAdmin,),
+        'change_password': (permissions.IsAuthenticated,),
     }
 
     filter_backends = (
@@ -198,6 +204,15 @@ class UserView(CRUDViewSet):
     )
     def users_travelers(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    @action(
+        detail=False, methods=['post']
+    )
+    def change_password(self, request, *args, **kwargs):
+        serializer = self.get_serializer(instance=request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 @extend_schema_view(
