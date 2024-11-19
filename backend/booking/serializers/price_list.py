@@ -10,3 +10,19 @@ class CurrentPriceSerializer(serializers.ModelSerializer):
             'last_day',
             'price',
         )
+
+
+class PriceListMixin:
+    fields = (
+        'id',
+        'first_day',
+        'last_day',
+        'price',
+    )
+
+
+class RoomPriceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndependentPriceList
+        fields = PriceListMixin.fields
+

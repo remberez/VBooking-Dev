@@ -84,6 +84,11 @@ class RUViewSet(ExtendedGenericViewSet, RetrieveModelMixin,
     pass
 
 
+class CUDViewSet(ExtendedGenericViewSet, UpdateModelMixin,
+                 CreateModelMixin, DestroyModelMixin):
+    pass
+
+
 class DestroyViewSet(ExtendedGenericViewSet, DestroyModelMixin):
     pass
 

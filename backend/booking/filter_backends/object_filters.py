@@ -1,4 +1,5 @@
-from django.db.models import Q, Prefetch
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Q, Prefetch, Count
 from rest_framework import filters, serializers
 import django_filters
 from booking.models.object import Object, Room
@@ -74,9 +75,15 @@ class ObjectFilterSet(django_filters.FilterSet):
             tags = list(map(int, value.split(',')))
         except ValueError:
             raise serializers.ValidationError('Неверный массив тегов')
-        for index in range(len(queryset)):
-            if not set(tags).issubset(set(queryset[index].tags)):
-                queryset = queryset.exclude(pk=queryset[index].pk)
+
+        # Выборка тегов не будет являться частью множества rooms__tags или independent__tags.
+        # Просто ищет пересечение этих множеств.
+        # tag_queries = Q(rooms__tags__id__in=tags) | Q(independent__tags__id__in=tags)
+        # queryset = queryset.filter(tag_queries).distinct()
+
+        tag_queries = Q(rooms__tags__id__in=tags) | Q(independent__tags__id__in=tags)
+        queryset = queryset.filter(tag_queries).annotate(tag_count=Count('rooms__tags') + Count('independent__tags'))
+        queryset = queryset.filter(tag_count=len(tags)).distinct()
         return queryset
 
     def filter_by_date(self, queryset, first_day=None, last_day=None):

@@ -57,13 +57,21 @@ class Object(models.Model):
     def reviews(self):
         return self.reviews.all().select_related('user')
 
+    @property
     def tags(self) -> List[Tag]:
         if not self.type.is_independent:
-            tags = []
-            for room in self.rooms.all():
-                tags.extend(room.tags.all())
-            return tags
-        return list(self.independent.tags.all())
+            tags = Tag.objects.filter(
+                rooms__in=self.rooms.all()
+            )
+        else:
+            tags = self.independent.tags.all()
+        return list(tags)
+
+    @property
+    def tags_ids(self) -> List[int]:
+        return list(
+            map(lambda x: x.pk, self.tags)
+        )
 
     @staticmethod
     def annotate_people(queryset: QuerySet[Object_type]) -> QuerySet[Object_type]:

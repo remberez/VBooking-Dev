@@ -1,3 +1,5 @@
+import pdb
+
 from rest_framework import serializers
 from booking.models.object import Object, IndependentObject, Room
 from booking.serializers.media import ImageObjectListSerializer, VideoObjectListSerializer
@@ -114,7 +116,6 @@ class ObjectListSerializer(serializers.ModelSerializer):
     address = AddressObjectListSerializer()
     min_price = serializers.DecimalField(max_digits=8, decimal_places=2)
     images = ImageObjectListSerializer(many=True)
-    # tags = serializers.SerializerMethodField(method_name='get_tags')
     tags = TagListSerializer(many=True)
     videos = VideoObjectListSerializer(many=True)
     type = ListRetrieveTypeOfObjectSerializer()
@@ -133,11 +134,6 @@ class ObjectListSerializer(serializers.ModelSerializer):
             'tags',
         )
         model = Object
-
-    # def get_tags(self, obj):
-    #     tags = obj.tags()
-    #     serializer = TagListSerializer(tags, many=True)
-    #     return serializer.data
 
 
 class ObjectSerializerUpdate(serializers.ModelSerializer):
@@ -177,11 +173,6 @@ class FavoritesObjectListSerializer(serializers.ModelSerializer):
             'videos',
             'tags',
         )
-
-    # def get_tags(self, obj):
-    #     tags = obj.tags()
-    #     serializer = TagListSerializer(tags, many=True)
-    #     return serializer.data
 
 
 class ObjectDetailSerializer(serializers.ModelSerializer):
