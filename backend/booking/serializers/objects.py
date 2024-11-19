@@ -3,13 +3,13 @@ import pdb
 from rest_framework import serializers
 from booking.models.object import Object, IndependentObject, Room
 from booking.serializers.media import ImageObjectListSerializer, VideoObjectListSerializer
-from booking.serializers.type import ListRetrieveTypeOfObjectSerializer
+from booking.serializers.type import TypeOfObjectSerializer
 from common.mixins.serializer_mixins import CommonMixin
 from booking.models.address import Address, ExactAddress
 from rest_framework import exceptions
 from booking.serializers.address import AddressCreateSerializer, ExactAddressCreateSerializer, \
     AddressObjectListSerializer
-from booking.serializers.tags import TagListSerializer
+from booking.serializers.tags import TagSerializer
 
 
 class IndependentObjectCreateSerializer(serializers.ModelSerializer):
@@ -116,9 +116,9 @@ class ObjectListSerializer(serializers.ModelSerializer):
     address = AddressObjectListSerializer()
     min_price = serializers.DecimalField(max_digits=8, decimal_places=2)
     images = ImageObjectListSerializer(many=True)
-    tags = TagListSerializer(many=True)
+    tags = TagSerializer(many=True)
     videos = VideoObjectListSerializer(many=True)
-    type = ListRetrieveTypeOfObjectSerializer()
+    type = TypeOfObjectSerializer()
 
     class Meta:
         fields = (
@@ -152,10 +152,9 @@ class ObjectSerializerUpdate(serializers.ModelSerializer):
 class FavoritesObjectListSerializer(serializers.ModelSerializer):
     address = AddressObjectListSerializer()
     images = ImageObjectListSerializer(many=True)
-    # tags = serializers.SerializerMethodField(method_name='get_tags')
-    tags = TagListSerializer(many=True)
+    tags = TagSerializer(many=True)
     videos = VideoObjectListSerializer(many=True)
-    type = ListRetrieveTypeOfObjectSerializer()
+    type = TypeOfObjectSerializer()
 
     class Meta:
         model = Object
@@ -176,7 +175,7 @@ class FavoritesObjectListSerializer(serializers.ModelSerializer):
 
 
 class ObjectDetailSerializer(serializers.ModelSerializer):
-    type = ListRetrieveTypeOfObjectSerializer()
+    type = TypeOfObjectSerializer()
 
     class Meta:
         model = Object
@@ -210,7 +209,7 @@ class ObjectDetailSerializer(serializers.ModelSerializer):
             )
 
     class RoomsSerializer(serializers.ModelSerializer):
-        tags = TagListSerializer(many=True)
+        tags = TagSerializer(many=True)
 
         class Meta:
             model = Room

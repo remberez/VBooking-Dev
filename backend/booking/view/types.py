@@ -1,9 +1,9 @@
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.permissions import AllowAny
+from booking.serializers.type import TypeOfObjectSerializer
 from common import permisions as custom_permissions
 from common.mixins.view_mixins import CRUDViewSet
 from booking.models.object import TypeOfObject
-from booking.serializers import type
 from common.pagination import BasePagination
 from rest_framework.filters import OrderingFilter
 
@@ -39,12 +39,7 @@ class TypeOfObjectView(CRUDViewSet):
         'list': (AllowAny,),
         'retrieve': (AllowAny,),
     }
-    multi_serializer_class = {
-        'list': type.ListRetrieveTypeOfObjectSerializer,
-        'retrieve': type.ListRetrieveTypeOfObjectSerializer,
-        'create': type.CreateTypeOfObjectSerializer,
-        'partial_update': type.UpdateTypeOfObjectSerializer,
-    }
+    serializer_class = TypeOfObjectSerializer
     pagination_class = BasePagination
     filter_backends = (
         OrderingFilter,

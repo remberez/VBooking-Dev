@@ -2,19 +2,7 @@ from rest_framework import serializers
 from booking.models.tags import Tag
 
 
-class TagListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Tag
-        fields = (
-            'title',
-            'svg',
-        )
-
-
-class ExtendTagListRetrieveSerializer(serializers.ModelSerializer):
-    type = serializers.CharField()
-
+class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = (
@@ -23,16 +11,12 @@ class ExtendTagListRetrieveSerializer(serializers.ModelSerializer):
             'type',
             'svg',
         )
-
-
-class CreateTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = (
-            'title',
-            'type',
-            'svg',
-        )
+        read_only_fields = ('id',)
 
     def validate_title(self, value):
         return value.capitalize()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = instance.type.name
+        return representation

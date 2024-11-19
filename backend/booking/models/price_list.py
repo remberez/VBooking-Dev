@@ -3,6 +3,8 @@ from typing import Optional
 from django.db import models
 from django.db.models import Q
 
+from booking.models.object import IndependentObject, Room, Object
+
 
 class BasePriceList(models.Model):
     first_day = models.DateField(
@@ -28,6 +30,17 @@ class BasePriceList(models.Model):
             Q(first_day__lte=first_day, last_day__gte=first_day) |
             Q(first_day__lte=last_day, last_day__gte=last_day)
         )
+
+    @staticmethod
+    def create_price_list(first_day, last_day, price, object, room=None):
+        if object.type.is_independent:
+            return IndependentPriceList.objects.create(
+                first_day=first_day, last_day=last_day, price=price, object=object.independent
+            )
+        else:
+            return PriceListOfRoom.objects.create(
+                first_day=first_day, last_day=last_day, price=price, object=room
+            )
 
 
 class IndependentPriceList(BasePriceList):

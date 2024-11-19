@@ -1,10 +1,10 @@
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.permissions import AllowAny
+from booking.serializers.tags import TagSerializer
 from common.mixins.view_mixins import CRUDViewSet
 from common.pagination import BasePagination
 from rest_framework.filters import OrderingFilter
 from booking.models.tags import Tag
-from booking.serializers import tags
 from common import permisions as custom_permissions
 
 
@@ -31,15 +31,13 @@ from common import permisions as custom_permissions
     )
 )
 class TagView(CRUDViewSet):
-    multi_serializer_class = {
-        'list': tags.ExtendTagListRetrieveSerializer,
-        'retrieve': tags.ExtendTagListRetrieveSerializer,
-        'create': tags.CreateTypeSerializer,
-    }
+    serializer_class = TagSerializer
     multi_permission_classes = {
         'list': (AllowAny,),
         'retrieve': (AllowAny,),
         'create': (custom_permissions.IsAdmin,),
+        'partial_update': (custom_permissions.IsAdmin,),
+        'destroy': (custom_permissions.IsAdmin,),
     }
 
     queryset = Tag.objects.all()
