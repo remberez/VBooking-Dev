@@ -27,13 +27,18 @@
 
       <div id="tags">
         {#each tegs as tag}
-          <span class="tag">{tag}</span>
+           <span class="tag"><img id="svgTag" src="{tag.svg}" alt=""> {tag.title}</span>
         {/each}
       </div>
     </a>
   </main>
 
 <style>
+
+    #svgTag{
+        width: 20px;
+        height: 20px;
+    }
 
     .block{
         width: 300px;
@@ -66,6 +71,8 @@
         background-color: rgba(128, 128, 128, 0.185);
         padding: 2px 5px 2px 5px;
         border-radius: 5px;
+        display: flex;
+        gap: 3px;
     }
 
     #sale{

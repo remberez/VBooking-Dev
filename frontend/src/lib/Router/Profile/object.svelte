@@ -8,6 +8,7 @@
 
     export let apartment;
     let isLoggedIn = false;
+    let url = 'http://localhost:8000'
 
     async function addToFavoritesHandler() {
         if (isLoggedIn) {
@@ -32,14 +33,18 @@
 {#if apartment}
 <main>
     <div class="photo">
-        <img id="middlePhoto" src="{apartment.images.length > 0 ? apartment.images[0] : imghg}" alt="">
+        {#if apartment.isFavorit}
+        <img id="middlePhoto" src="{url}{apartment.images[0]}" alt="">
+        {:else}
+            <img id="middlePhoto" src="{apartment.images[0]}" alt="">
+        {/if}    
     </div>
 
     <div class="info">
         <div class="blockInfo">
             <div class="nameAdress">
                 <h1>
-                    {apartment.type} «{apartment.title}»
+                    {apartment.type.name} «{apartment.title}»
                 </h1>
                 <p>
                     {apartment.city}, {apartment.street}
@@ -54,7 +59,9 @@
                 <div class="fullTags">
                     {#if apartment.tags.length > 0}
                         {#each apartment.tags.slice(0, 6) as tag}
-                            {tag}
+                         <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                            <img style="width: 15px; height: 15px;" src="{tag.svg}" alt="">   {tag.title}
+                         </div> 
                         {/each}
                     {:else}
                         <p>Нет тегов</p>
@@ -82,6 +89,10 @@
     <p>Нет доступных квартир</p>
 {/if}
 <style>
+    main{
+        background-color: white;
+    }
+
     .block{
         height: 70%;
         display: flex;

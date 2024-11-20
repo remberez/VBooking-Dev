@@ -3,6 +3,7 @@
     import Header from "./header.svelte";
     import Footer from "../Main/footer.svelte";
     import Cookies from 'js-cookie';
+    import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
     import axios from "axios";
 
@@ -13,11 +14,14 @@
     let userInfo;
     let showUserInfo = false;
     const info = JSON.parse(Cookies.get('info') || '{}');
-    let { surname, name, email, phone, position, id} = info;
+    let { surname, name, email, phone, position, id } = info;
     let gender = 'Мужчина';
+    let url = 'http://127.0.0.1:8000/api/'
+    let favotitsOBJ = []
 
-    let filteredApartments
-    console.log(id)
+    console.log(info)
+
+    console.log(Cookies.get('token'))
 
     const toggleUserInfo = () => {
         showUserInfo = !showUserInfo;
@@ -26,15 +30,114 @@
         }
     };
 
-    async function getFavorites(){
-        const response = await axios.get(``)
+    async function getFavorites() {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/users/${id}/get_user_favorites/`);
+            favotitsOBJ = await Promise.all(response.data.map(async (object) => {
+                const cityName = await fetchCityName(object.address.city);
+                console.log(cityName)
+                return {
+                    id: object.id,
+                    city: cityName || object.address.city,
+                    street: object.address.street,
+                    house: object.address.house,
+                    seaDistance: object.address.sea_distance,
+                    title: object.name,
+                    description: object.description || "No description",
+                    minPrice: object.min_price,
+                    type: object.type,
+                    images: object.images.length > 0 ? object.images.map(image => image.media) : [],
+                    tags: object.tags.map(tag => tag),
+                    isFavorit: true,
+                };
+            }));
+        } catch (error) {
+            console.error('Error fetching objects:', error);
+        }
     }
+
+    let selectedImage; // Переменная для хранения загруженного изображения
+    async function toEditUser() {
+    const updatedData = {
+        email,
+        phone,
+        surname,
+        name,
+        patronymic: '',
+    };
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('surname', surname);
+    formData.append('name', name);
+    formData.append('patronymic', '');
+    if (selectedImage) {
+        formData.append('image', selectedImage);
+    }
+
+    try {
+        
+        const response = await axios.patch(`http://localhost:8000/api/users/${id}/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${Cookies.get('token')}` 
+            },
+        });
+        if (imageUrl) {
+                await setImage(imageUrl);
+            }
+        console.log('Данные пользователя успешно обновлены:', response.data);
+    } catch (error) {
+        console.error("Ошибка изменения данных пользователя:", error.response);
+    }
+}
+    
+let imageUrl
+
+function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                imageUrl = reader.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function setImage(imageUrl) {
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/api/users/${id}/set_image/`, {
+                image: imageUrl
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('token')}`, 
+                }
+            });
+            console.log('Изображение успешно обновлено:', response.data);
+        } catch (error) {
+            console.error("Ошибка обновления изображения:", error.response);
+        }
+    }
+
 
     const handleResize = () => {
         if (userInfo) { 
             userInfo.style.display = document.body.clientWidth > 769 ? 'block' : 'none'; 
         }
     };
+
+    async function fetchCityName(cityId) {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/city/${cityId}/`);
+            return response.data.name; 
+        } catch (error) {
+            console.error('Error fetching city name:', error);
+            return null; 
+        }
+    }
 
     window.addEventListener('resize', handleResize);
     onDestroy(() => window.removeEventListener('resize', handleResize));
@@ -56,6 +159,10 @@
         activeTab = tab
         localStorage.setItem("activeTab",tab);
     };
+
+    onMount(() =>{
+        getFavorites()
+    })
 </script>
 
 <main>
@@ -89,7 +196,7 @@
                         <h1>Настройка профиля</h1>
                         <p>Введите свои данные, для автоматического заполнения при бронировании.</p>
 
-                        <form id="settingsUser">
+                        <form id="settingsUser" on:submit|preventDefault={toEditUser}>
                             <div class="block">
                                 <div class="input">
                                     <input type="text" bind:value={surname} id="surname" placeholder=" " required>
@@ -100,23 +207,23 @@
                                     <label for="name">Имя</label>  
                                 </div>
                             </div>
-
+                        
                             <div class="block">
                                 <div class="input">
-                                    <input type="date" id="birthdate" required>
+                                    <input type="date"  id="birthdate" required>
                                     <label for="birthdate">Дата рождения</label>
                                 </div>
                                 <div class="input">
-                                    <input type="text" id="citizenship" placeholder=" " required>
+                                    <input type="text"  id="citizenship" placeholder=" " required>
                                     <label for="citizenship">Гражданство</label>
                                 </div>
                             </div>
-
+                        
                             <label id="gender">
                                 <input type="radio" bind:group={gender} value="Мужчина" checked /> Мужчина
                                 <input type="radio" bind:group={gender} value="Женщина" /> Женщина
                             </label>
-
+                        
                             <div class="block">
                                 <div class="input">
                                     <input type="text" bind:value={phone} id="phone" placeholder=" " required>
@@ -126,8 +233,26 @@
                                     <input type="text" bind:value={email} id="emailInput" placeholder=" " required>
                                     <label for="emailInput">Эл Почта</label>  
                                 </div>
+
+
+ 
+
                             </div>
-                            <button id="save">Сохранить</button>
+                            <button id="save" type="submit">Сохранить</button>
+                        </form>
+                        <hr style="margin-bottom: 20px;">
+                    </div>
+
+                    <div class="blockAddPhoto">
+                        <form>
+
+                            <img src="{info.image}" alt="">
+
+                            <div class="input">
+                                <input type="file" on:change={handleFileUpload} accept="image/*" />
+                                <label for="imageInput">Загрузить изображение</label>
+                                <a on:click={setImage}>отправить фото</a>
+                            </div>
                         </form>
                     </div>
 
@@ -166,9 +291,15 @@
                     {:else if activeTab === 'bookings'}
                         <div>"Мои бронирования"</div>
                     {:else if activeTab === 'favorites'}
-                        <div>
+                        <div id="favorites">
                             "Избранное"
-                        
+                            <hr id="line">
+
+                            <div class="blockFavorites">
+                                {#each favotitsOBJ as apartment}
+                                    <Object {apartment} />
+                                {/each}
+                            </div>
                         </div>
                     {:else if activeTab === 'reviews'}
                         <div>"Мои отзывы"</div>
@@ -184,6 +315,22 @@
 </main>
 
 <style>
+
+    .blockAddPhoto{
+        margin-top: 100px;
+    }
+
+    .blockAddPhoto a{
+        background-color: aqua;
+    }
+
+    .blockFavorites{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+        
+    }
 
     .blockResPassword h1{
         font-size: 18px;
@@ -323,6 +470,7 @@
         justify-content: center;
         flex-direction: column;
         align-items: center;
+        margin-bottom: 20px;
     }
 
     #email {
