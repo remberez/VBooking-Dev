@@ -1,4 +1,7 @@
-from typing import List, TypeVar, Optional, Tuple
+from datetime import date
+from typing import List, TypeVar, Optional, Tuple, Union, Dict
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, Case, When, F, Max, Min, QuerySet
 from booking.models.tags import Tag
@@ -117,6 +120,46 @@ class Object(models.Model):
                 output_field=models.DecimalField(),
             )
         )
+
+    @property
+    def is_independent(self) -> bool:
+        return self.type.is_independent
+
+    @property
+    def price_list(self) -> Union[Dict['Room', QuerySet], QuerySet]:
+        if self.is_independent:
+            return self.independent.price_list.all()
+
+        rooms = self.rooms.prefetch_related('price_list').all()
+        price_list = {}
+
+        for room in rooms:
+            price_list[room] = room.price_list.all()
+        return price_list
+
+    def check_price_list_date(self, first_day: date, last_day: date) -> None:
+        def ranges_non_overlapping(start1: date, end1: date, start2: date, end2: date) -> bool:
+            return end1 <= start2 or end2 <= start1
+
+        if not self.is_independent:
+            for room, price_lists in self.price_list.items():
+                for price_list in price_lists:
+                    if not ranges_non_overlapping(
+                            first_day, last_day, price_list.first_day, price_list.last_day
+                    ):
+                        raise ValidationError(
+                            f"Промежуток {first_day} - {last_day} пересекается с датами "
+                            f"{price_list.first_day} - {price_list.last_day} для комнаты {room}."
+                        )
+        else:
+            for price_list in self.price_list:
+                if not ranges_non_overlapping(
+                    first_day, last_day, price_list.first_day, price_list.last_day
+                ):
+                    raise ValidationError(
+                        f"Промежуток {first_day} - {last_day} пересекается с датами "
+                        f"{price_list.first_day} - {price_list.last_day} для объекта {self}."
+                    )
 
 
 class BaseRoom(models.Model):

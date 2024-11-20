@@ -1,7 +1,7 @@
+from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.response import Response
-
 from booking.models.object import IndependentObject, Object
 from booking.serializers.price_list import PriceListSerializer
 from common.mixins.view_mixins import CUDViewSet
@@ -24,6 +24,15 @@ class PriceListView(CUDViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        obj = serializer.validated_data.get('object')
+        first_day, last_day = serializer.validated_data.get('first_day'), serializer.validated_data.get('last_day')
+
+        try:
+            obj.check_price_list_date(first_day, last_day)
+        except ValidationError as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=[e.message])
+
         BasePriceList.create_price_list(**serializer.validated_data)
         return Response(status=status.HTTP_201_CREATED, data=serializer.data)
 
