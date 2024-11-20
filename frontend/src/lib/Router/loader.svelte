@@ -40,9 +40,9 @@
     .loader {
         width: 50px;
         height: 50px;
-        border: 10px solid  #6609ED;
+        border: 10px solid  #0023D7;
         border-radius: 50%;
-        border-left-color:#460b99ea ;
+        border-left-color: #001896 ;
         animation: loader 1.3s linear infinite;
     }
 

@@ -130,13 +130,14 @@
   }
 
   .block {
-    margin-top: 100px;
+    margin-top: 50px;
     text-align: start;
     width: clamp(320px, 100%, 1300px);
   }
 
   .active {
     color: var(--color);
+    border-bottom: 3px var(--color) solid;
   }
 
   #gorizontal-line {
@@ -171,7 +172,8 @@
     text-align: left;
     text-underline-position: from-font;
     text-decoration-skip-ink: none;
-
+    padding-bottom: 5px;
+    margin-right: 20px;
   }
 
   section {

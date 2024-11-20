@@ -24,12 +24,6 @@
       <p id="one">{nameObject}</p>
       <p id="two">{city}, {distans}{distansString} до моря</p>
       <p id="sale">от {sale} руб <span>в сутки</span></p>
-
-      <div id="tags">
-        {#each tegs as tag}
-           <span class="tag"><img id="svgTag" src="{tag.svg}" alt=""> {tag.title}</span>
-        {/each}
-      </div>
     </a>
   </main>
 
@@ -58,11 +52,6 @@
         align-items: center;
         gap: 10px;
         margin-top: 10px;
-        padding-left: 10px;
-    }
-
-    p{
-        padding: 0 10px 0 10px;
     }
 
     .tag{
@@ -86,6 +75,10 @@
         margin-top: 10px;
     }
 
+    #sale span {
+        font-weight: 300;
+    }
+
     #one{
         font-family: Rubik;
         font-size: 20px;
@@ -96,7 +89,6 @@
         text-align: left;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-
     }
 
     #two{
@@ -115,14 +107,13 @@
         display: flex;
         justify-content: center;
         border-radius: 10px;
-        border: 2px rgba(128, 128, 128, 0.281) solid;
         padding-bottom: 10px;
     }
 
     img{
         height: 100%;
         width: 100%;
-        border-radius: 10px 10px 0px 0;
+        border-radius: 10px;
         object-fit: cover;
     }
 

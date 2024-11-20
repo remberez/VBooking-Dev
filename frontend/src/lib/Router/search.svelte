@@ -178,8 +178,7 @@
         <div bind:this={backFiltersBlock} class="blockFilters">
             <div bind:this={filtersBlock} class="priceList">
                 <div class="bablo">
-                    <h1>Цена за номер, руб.</h1>
-                    <p>от <span>{selectedMinPrice}</span> до <span>{selectedMaxPrice}</span> руб.</p>
+                    <h1>Цена за номер, руб.</h1> <p>от <span>{selectedMinPrice}</span> до <span>{selectedMaxPrice}</span> руб.</p>
                     <div class="blockProgress">
                         <div class="sliderContainer">
                             <input type="range" min={minPrice} max={maxPrice} bind:value={selectedMinPrice} on:input={updateFilteredApartments} class="slider" />
@@ -462,6 +461,10 @@ input[type='range']::-webkit-slider-thumb {
         align-items: center;
         flex-direction: column;
         border-radius: 20px;
+    }
+
+    .block6 label {
+        font-size: 16px;
     }
 
     @media(max-width:1195px){

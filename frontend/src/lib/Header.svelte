@@ -101,6 +101,7 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
   }
 
   #goToProf svg{
