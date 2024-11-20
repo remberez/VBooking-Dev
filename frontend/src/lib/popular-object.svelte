@@ -31,9 +31,10 @@
           minPrice: object.min_price, 
           type: object.type, 
           images: object.images.length > 0 ? object.images[0].media : null, 
-          tags: object.tags.map(tag => tag.title) 
+          tags: object.tags.map(tag => tag) 
         };
       }));
+      console.log(cards)
       filterCardsByCategory(activeButton);
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
@@ -41,7 +42,7 @@
   }
 
   function filterCardsByCategory(categoryId) {
-    if (categoryId) filteredCards = cards.filter(card => card.type === categoryId);
+    if (categoryId) filteredCards = cards.filter(card => card.type.id === categoryId);
     else filteredCards = cards;
   }
 
@@ -64,7 +65,6 @@
       console.error("Ошибка при получении типов объектов:", error.response);
     }
   }
-
 
   onMount(()=>{
     fetchObjects();

@@ -25,6 +25,7 @@
     let openFilters = true
     let filtersBlock
     let backFiltersBlock
+    let tags = []
 
     function openFiltersBlock(){
         if (openFilters) {
@@ -68,6 +69,7 @@
             const response = await axios.get('http://localhost:8000/api/objects/');
             apartments = await Promise.all(response.data.map(async (object) => {
                 const cityName = await fetchCityName(object.address.city);
+                console.log(cityName)
                 return {
                     id: object.id,
                     city: cityName || object.address.city,
@@ -79,16 +81,24 @@
                     minPrice: object.min_price,
                     type: object.type,
                     images: object.images.length > 0 ? object.images.map(image => image.media) : [],
-                    tags: object.tags.map(tag => tag.title),
+                    tags: object.tags.map(tag => tag),
                 };
             }));
             filteredApartments = apartments;
-            await updateObjectTypes(); 
         } catch (error) {
             console.error('Error fetching objects:', error);
         }
     }
 
+    async function getObjectForTags(){
+        try{
+            const response = await axios.get(`http://localhost:8000/api/tags/`)
+            tags = response.data
+        } catch(error){
+            console.error("Ошибка при поиске объектов по тегам", error.response)
+        }
+    }
+    getObjectForTags()
     async function fetchObjectTypeDetails(typeId) {
         try {
             const response = await axios.get(`http://localhost:8000/api/types-of-objects/${typeId}/`);
@@ -99,20 +109,11 @@
         }
     }
 
-    async function updateObjectTypes() {
-        for (let i = 0; i < apartments.length; i++) {
-            apartments[i].type = await fetchObjectTypeDetails(apartments[i].type);
-        }
-    }
-
     function updateFilteredApartments() {
         filteredApartments = apartments.filter(apartment => {
             const matchesCity = apartment.city === city;
             const matchesMinPrice = apartment.minPrice >= selectedMinPrice;
             const matchesMaxPrice = apartment.minPrice <= selectedMaxPrice;
-
-            const matchesCategories = selectedCategories.length === 0 || selectedCategories.includes(apartment.type);
-            const matchesTags = selectedTags.length === 0 || apartment.tags.some(tag => selectedTags.includes(tag));
 
             return matchesCity && matchesMinPrice && matchesMaxPrice && matchesCategories && matchesTags;
         });
@@ -201,20 +202,22 @@
                                             updateFilteredApartments();
                                         }} 
                                     />
-                                    <label for="">{category}</label>
+                                    <label for="">{category.name}</label>
                                 </div>
                             {/each}
                         </div>
                     </div>
                     <div class="blockChooseType">
-                        <h1>Теги</h1>
                         <div class="blockYes">
-                            {#each [...new Set(apartments.flatMap(a => a.tags))] as tag}
+                            {#each tags as tag}
+                            <h1>{tag.type}</h1>
+                            {#each tags.filter(t => t.type === tag.type) as tagTitle}
                                 <div class="block6">
-                                    <input type="checkbox" bind:group={selectedTags} value={tag} on:change={updateFilteredApartments}>
-                                    <label for="">{tag}</label>
+                                    <input type="checkbox" >
+                                    <label for="">{tagTitle.title}</label>
                                 </div>
                             {/each}
+                        {/each}
                         </div>
                     </div>
                 </div>
@@ -228,8 +231,6 @@
                     <a bind:this={tabOne} on:click={() => { switchTab("popular"); updateFilteredApartments(); }}>По популярности</a>
                     <a bind:this={tabTwo} on:click={() => { switchTab("raiting"); updateFilteredApartments(); }}>По рейтингу</a>
                     <a bind:this={tabThree} on:click={() => { switchTab("nerdeSea"); updateFilteredApartments(); }}>Ближе к морю</a>
-
-
 
                     <svg on:click={openFiltersBlock}  class="menu-icon" viewBox="0 0 24 24">
                         <path d="M3 6h18M3 12h18m-7 6h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -330,7 +331,7 @@ input[type='range']::-webkit-slider-thumb {
     }
 
     .bablo p{
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 300;
         line-height: 23.7px;
         word-spacing: 5px;
@@ -375,7 +376,7 @@ input[type='range']::-webkit-slider-thumb {
     }
 
     .blockFilters{
-        width: 343px;
+        width: 300px;
         background: #FFFFFF;
         padding: 25px;
         border: 2px rgba(128, 128, 128, 0.089) solid;
@@ -385,7 +386,6 @@ input[type='range']::-webkit-slider-thumb {
 
     .blockPage{
         display: flex;
-        max-width: 817px;
         gap: 30px;
         flex-grow: 1;
         flex-direction: column;
@@ -418,6 +418,7 @@ input[type='range']::-webkit-slider-thumb {
         flex-grow: 1;
         margin: 0 auto;
         width:100%;
+        gap: 15px;
     }
 
     .block{
