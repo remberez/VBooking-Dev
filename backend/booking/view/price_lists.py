@@ -11,6 +11,8 @@ from booking.filter_backends.priice_list_filter import PriceListFilter
 from booking.models.price_list import BasePriceList, PriceListOfRoom, IndependentPriceList
 from rest_framework.permissions import IsAuthenticated
 
+from common.permisions import IsOwnerOfObjectByPriceList, IsAdmin
+
 
 @extend_schema_view(
     create=extend_schema(
@@ -20,11 +22,11 @@ from rest_framework.permissions import IsAuthenticated
 )
 class PriceListView(CUDViewSet):
     filter_backends = (
-        PriceListFilter,
+        # PriceListFilter,
         OrderingFilter,
         DjangoFilterBackend,
     )
-    permission_classes = IsAuthenticated
+    permission_classes = (IsAuthenticated, IsOwnerOfObjectByPriceList | IsAdmin)
     ordering = ('id',)
     serializer_class = PriceListSerializer
 
@@ -47,13 +49,4 @@ class PriceListView(CUDViewSet):
         return Response(status=status.HTTP_201_CREATED, data=serializer.data)
 
     def get_queryset(self):
-        object_id = self.request.query_params.get('object')
-        if object_id:
-            try:
-                obj = IndependentObject.objects.get(id=object_id)
-                if obj.type.is_independent:
-                    return IndependentPriceList.objects.all()
-            except IndependentObject.DoesNotExist:
-                pass
-
-        return PriceListOfRoom.objects.all()
+        pass

@@ -31,3 +31,8 @@ class IsOwnerOfObject(IsOwnerPosition):
 class EmailIsActivate(BasePermission):
     def has_permission(self, request, view):
         return request.user.mail_confirmed
+
+
+class IsOwnerOfObjectByPriceList(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.object.base_object.owner == request.user
