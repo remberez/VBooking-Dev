@@ -137,14 +137,26 @@ class Object(models.Model):
             price_list[room] = room.price_list.all()
         return price_list
 
-    def check_price_list_date(self, first_day: date, last_day: date) -> None:
-        def ranges_non_overlapping(start1: date, end1: date, start2: date, end2: date) -> bool:
-            return end1 <= start2 or end2 <= start1
+    def check_price_list_date(
+            self, first_day: date, last_day: date, exclude: Optional[Tuple[date, date]] = None
+    ) -> None:
+        """
+        :param first_day: Первый день интервала.
+        :param last_day: Второй день интервала.
+        :param exclude: Интервал, который не нужно учитывать при проверке.
+        :return: Вызывает исключение ValidationError или не возвращает ничего
+        """
+        def ranges_overlapping(start1: date, end1: date, start2: date, end2: date) -> bool:
+            if start1 <= end2 and start2 <= end1:
+                exclude_start, exclude_end = exclude
+                if not (start2 >= exclude_start and end2 <= exclude_end):
+                    return True
+            return False
 
         if not self.is_independent:
             for room, price_lists in self.price_list.items():
                 for price_list in price_lists:
-                    if not ranges_non_overlapping(
+                    if ranges_overlapping(
                             first_day, last_day, price_list.first_day, price_list.last_day
                     ):
                         raise ValidationError(
@@ -153,7 +165,7 @@ class Object(models.Model):
                         )
         else:
             for price_list in self.price_list:
-                if not ranges_non_overlapping(
+                if ranges_overlapping(
                     first_day, last_day, price_list.first_day, price_list.last_day
                 ):
                     raise ValidationError(
