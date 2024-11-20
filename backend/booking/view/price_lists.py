@@ -1,24 +1,31 @@
 from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
-from booking.models.object import IndependentObject, Object
+from booking.models.object import IndependentObject
 from booking.serializers.price_list import PriceListSerializer
 from common.mixins.view_mixins import CUDViewSet
 from rest_framework.filters import OrderingFilter
 from booking.filter_backends.priice_list_filter import PriceListFilter
-from common.pagination import BasePagination
 from booking.models.price_list import BasePriceList, PriceListOfRoom, IndependentPriceList
+from rest_framework.permissions import IsAuthenticated
 
 
+@extend_schema_view(
+    create=extend_schema(
+        summary='Добавить прайс',
+        tags=['Прайс листы'],
+    )
+)
 class PriceListView(CUDViewSet):
     filter_backends = (
         PriceListFilter,
         OrderingFilter,
         DjangoFilterBackend,
     )
+    permission_classes = IsAuthenticated
     ordering = ('id',)
-    pagination_class = BasePagination
     serializer_class = PriceListSerializer
 
     def create(self, request, *args, **kwargs):
@@ -27,6 +34,9 @@ class PriceListView(CUDViewSet):
 
         obj = serializer.validated_data.get('object')
         first_day, last_day = serializer.validated_data.get('first_day'), serializer.validated_data.get('last_day')
+
+        if obj.owner != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
             obj.check_price_list_date(first_day, last_day)

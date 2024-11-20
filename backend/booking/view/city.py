@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.permissions import AllowAny
 from booking.models.address import City
 from common.mixins.view_mixins import CRUDViewSet
-from booking.serializers.city import CityListRetrieveSerializer, CityCreateUpdateSerializer
+from booking.serializers.city import CitySerializer
 from common.pagination import BasePagination
 from common.permisions import IsAdmin
 from rest_framework.filters import OrderingFilter
@@ -31,12 +31,8 @@ from rest_framework.filters import OrderingFilter
     ),
 )
 class CityView(CRUDViewSet):
-    multi_serializer_class = {
-        'list': CityListRetrieveSerializer,
-        'create': CityCreateUpdateSerializer,
-        'retrieve': CityListRetrieveSerializer,
-        'partial_update': CityCreateUpdateSerializer,
-    }
+    serializer_class = CitySerializer
+
     multi_permission_classes = {
         'list': (AllowAny,),
         'create': (IsAdmin,),

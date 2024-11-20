@@ -2,7 +2,7 @@ from booking.models.address import City
 from rest_framework import serializers
 
 
-class CityListRetrieveSerializer(serializers.ModelSerializer):
+class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = (
@@ -10,15 +10,7 @@ class CityListRetrieveSerializer(serializers.ModelSerializer):
             'name',
             'image',
         )
-
-
-class CityCreateUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = City
-        fields = (
-            'name',
-            'image',
-        )
+        read_only_fields = ('id',)
 
     def validate(self, attrs):
         attrs['name'] = attrs['name'].capitalize()
