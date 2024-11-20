@@ -13,7 +13,6 @@
     <div class="block2">
       <div class="photo">
           <img src="{src1}" alt="">
-          <img id="blur" src="{blur}" alt="">
       </div>
       <h2>Геленджик</h2>
     </div>
@@ -22,7 +21,6 @@
       <div class="block2">
           <div class="photo">
             <img src="{src2}" alt="">
-            <img id="blur" src="{blur}" alt="">
           </div>
         <h2>Кабардинка</h2>
       </div>
@@ -32,7 +30,6 @@
       <div class="block2">
         <div class="photo">
           <img src="{src3}" alt="">
-          <img id="blur" src="{blur}" alt="">
         </div>
       <h2>Дивноморское</h2>
       </div>

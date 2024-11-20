@@ -183,10 +183,10 @@ function handleFileUpload(event) {
                     <a id="profileEdite" on:click={() => switchTab('settingsProfile')}>Настроить профиль</a>
                     <hr id="line">
                     <div class="userChoose">
-                        <p on:click={() => switchTab('bookings')}>Мои бронирования</p>
-                        <p on:click={() => switchTab('favorites')}>Избранное</p>
-                        <p on:click={() => switchTab('reviews')}>Мои отзывы</p>
-                        <p on:click={() => switchTab('history')}>История отелей</p>
+                        <p on:click={() => switchTab('bookings')} class:selected={activeTab === 'bookings'}>Мои бронирования</p>
+                        <p on:click={() => switchTab('favorites')} class:selected={activeTab === 'favorites'}>Избранное</p>
+                        <p on:click={() => switchTab('reviews')} class:selected={activeTab === 'reviews'} >Мои отзывы</p>
+                        <p on:click={() => switchTab('history')} class:selected={activeTab === 'history'} >История отелей</p>
                     </div>
                 </div>
 
@@ -315,6 +315,23 @@ function handleFileUpload(event) {
 </main>
 
 <style>
+    .userInfo, .userSettings {
+        border-radius: 7px;
+    }
+
+    .userInfo p.selected {
+        border-left: 2px var(--color) solid;
+        padding-left: 13px;
+        background: linear-gradient(to right, rgba(0,35,215, 0.1) 1%, transparent 100%);
+    }
+
+    .userInfo p:hover {
+        color: var(--color);
+    }
+
+    #email:hover {
+        color: black;
+    }
 
     .blockAddPhoto{
         margin-top: 100px;
@@ -479,6 +496,7 @@ function handleFileUpload(event) {
         font-weight: 400;
         line-height: 18.96px;
         text-align: left;
+        padding-left: 15px;
     }
 
     .addUserInfo h1 {
@@ -507,12 +525,20 @@ function handleFileUpload(event) {
     .userChoose {
         display: flex;
         flex-direction: column;
-        gap: 23px;
+        gap: 5px;
         font-family: Rubik;
         font-size: 14px;
         font-weight: 400;
         line-height: 16.59px;
         text-align: left;
+    }
+
+    .userChoose p {
+        cursor: pointer;
+        user-select: none; 
+        padding-left: 15px;
+        padding-top: 12px;
+        padding-bottom: 12px
     }
 
     #profileEdite {
@@ -522,6 +548,8 @@ function handleFileUpload(event) {
         line-height: 14.22px;
         text-align: left;
         color: var(--color);
+        padding-left: 15px;
+        cursor: pointer;
     }
 
     #line {
@@ -531,7 +559,7 @@ function handleFileUpload(event) {
     .userInfo {
         width: 270px;
         background: white;
-        padding: 15px;
+        padding: 15px 0;
     }
 
     .size {

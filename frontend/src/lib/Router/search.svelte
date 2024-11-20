@@ -178,14 +178,13 @@
         <div bind:this={backFiltersBlock} class="blockFilters">
             <div bind:this={filtersBlock} class="priceList">
                 <div class="bablo">
-                    <h1>Цена за номер, руб.</h1> <p>от <span>{selectedMinPrice}</span> до <span>{selectedMaxPrice}</span> руб.</p>
+                    <h1>Цена за номер, руб.</h1> <p>от <span>{selectedMinPrice}</span> до <span>{selectedMaxPrice}</span></p>
                     <div class="blockProgress">
                         <div class="sliderContainer">
                             <input type="range" min={minPrice} max={maxPrice} bind:value={selectedMinPrice} on:input={updateFilteredApartments} class="slider" />
                             <input id="slidee" type="range" min={minPrice} max={maxPrice} bind:value={selectedMaxPrice} on:input={updateFilteredApartments} class="slider" />
                         </div>
                     </div>
-
                     <div class="blockChooseType">
                         <h1>Категории</h1>
                         <div class="blockYes">
@@ -255,7 +254,6 @@
 </main>
 
 <style>
-
 .sort svg{
     width: 40px;
     height: 40px;
@@ -303,10 +301,12 @@ input[type='range']::-webkit-slider-thumb {
     width: 20px; 
     z-index: 10;
     background: #007bff; 
+    border: 2px white solid;
     border-radius: 50%; 
     cursor: pointer; 
     pointer-events: auto;
     position: relative; 
+    box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.3); /* Тень */
 }
 
     .bablo span{

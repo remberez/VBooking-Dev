@@ -51,7 +51,7 @@ function exit() {
     }
 
     main{
-        height: 98px;
+        height: 70px;
         display: flex;
         justify-content: center;
         align-items: center;
