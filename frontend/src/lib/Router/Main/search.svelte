@@ -47,7 +47,7 @@
     };
 </script>
 
-<main style="width: {width}{type};">
+<main>
     <form on:submit={handleSubmit}>
         <div class="input">
             <label for="city">Курорт</label>
@@ -80,32 +80,28 @@
             <input type="number" bind:value={adults} placeholder="Введите количество" min="1" />
         </div>
     </form>
-    <button on:click={handleSubmit} > <p id="search" >Найти</p> <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve"><path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23 s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92 c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17 s-17-7.626-17-17S14.61,6,23.984,6z"/></svg></button>
+    <button on:click={handleSubmit} > <p id="search" >Поиск</p></button>
 </main>
 
 <style>
 
     button{
-        width: 59px;
-        height: 59px;
-        border-radius: 20px;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 0.01px solid rgba(124, 124, 124, 0.705);
-    }
-    button svg{
-        width: 29px;
+        border-radius: 15px;
+        padding: 0 20px;
+        font-size: 20px;
+        font-weight: 400;
+        color: rgb(172, 172, 172);
+        box-shadow: -1px 0px 5px rgba(0,35,215, 0.2);
     }
 
-    #search{
-        display: none;
+    button:hover {
+        background-color: #eaedff;
+        cursor: pointer;
     }
 
     main {
+        overflow: hidden;
         background: white;
-        padding-left: 10px;
         border-radius: 8px;
         border-top-right-radius: 20px;
         border-bottom-right-radius: 20px;
@@ -113,11 +109,24 @@
         max-width: 1200px;
         flex-wrap: wrap;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
     }
 
     .input {
         position: relative;
+        padding: 15px 80px 15px 20px;
+    }
+
+    .input,
+    .input *,
+    button {
+        transition: background-color 0.2s ease;
+    }
+
+    .input:hover,
+    .input:hover * {
+        background-color: #eaedff;
+        cursor: pointer;
     }
 
     .input label {
@@ -126,7 +135,6 @@
         line-height: 16.59px;
         color: #808080;
         display: block;
-        transition: transform 0.3s ease, color 0.3s ease;
     }
 
     select:focus, option:focus{
@@ -172,17 +180,13 @@
 
     form {
         display: flex;
-        justify-content: space-around;
         align-items: center;
         flex-wrap: wrap;
-        gap: 40px;
-        padding: 5px;
     }
 
     .separator {
-        border-left: 2px solid #cccccc5d; 
-        height: 50px; 
-        margin: 0 20px; 
+        border-left: 2px solid #eaedff; 
+        height: 70%; 
     }
 
     input[type="number"] {
@@ -196,29 +200,15 @@
     }
 
     @media (max-width:1101px){
-        #search{
-            display: block;
-            color: black;
-            font-size: 25px;
-        }
-
         main{
             border-radius: 20px;
-            padding: 20px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #colPeple{
-            width: 150px;
+            align-items: flex-start;
         }
 
         button{
-            margin-top: 20px;
             width: 100%;
-            display: flex;
-            gap: 10px;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
 
         .separator{
@@ -229,15 +219,14 @@
             background-color: #cccccc5d; 
         }
 
-        form{
-            width: 100%;
-            gap: 20px;
-            align-items: start;
-            flex-direction: column;
-        }
-
         main{
             max-width: 800px;
+        }
+
+        .input {
+            width: 100%;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
     }
 </style>
