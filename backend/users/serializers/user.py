@@ -1,105 +1,22 @@
+from typing import List, Dict
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework import exceptions
 import re
 from django.core import exceptions as django_exceptions
-from rest_framework.exceptions import ParseError
-from common.mixins.serializer_mixins import CommonMixin
+from rest_framework.exceptions import ParseError, ValidationError
 from common.base_position import *
 from users.models.email_activate import EmailActivate
 from .citizenship import CitizenshipSerializer
+from users.serializers.traveler import TravelerListSerializer
 
 User = get_user_model()
 
 
-class UserValidation(CommonMixin):
-    @staticmethod
-    def position_validate(position):
-        if position.code in (get_user_position(), get_owner_position()):
-            return position
-        raise ParseError('Неверная должность')
-
-    @staticmethod
-    def email_validate(email):
-        if len(email.split('@')) != 2:
-            raise exceptions.ParseError('Неверный формат почты.')
-        if email in User.objects.values_list('email', flat=True):
-            raise exceptions.ParseError('Почта уже зарегистрирована.')
-
-    @staticmethod
-    def phone_validate(phone):
-        if not re.match(r'^\+?1?\d{9,15}$', phone):
-            raise exceptions.ParseError(
-                "Неправильный номер телефона. Он должен содержать от 9 до 15 цифр, начиная с кода страны."
-            )
-        if phone in User.objects.values_list('phone', flat=True):
-            raise exceptions.ParseError('Телефон уже зарегистрирован.')
-
-    def validate(self, attrs):
-        errors = {}
-        attrs = self.to_capitalize(attrs, ['surname', 'name', 'patronymic'])
-        try:
-            value = attrs.get('email')
-            if value:
-                self.email_validate(value)
-        except exceptions.ParseError as e:
-            errors['email'] = str(e)
-        try:
-            value = attrs.get('phone')
-            if value:
-                self.phone_validate(attrs.get('phone'))
-        except exceptions.ParseError as e:
-            errors['phone'] = str(e)
-        try:
-            value = attrs.get('password')
-            if value:
-                validate_password(attrs['password'])
-        except django_exceptions.ValidationError as e:
-            errors['password'] = ' '.join(e)
-        try:
-            value = attrs.get('position')
-            if value:
-                self.position_validate(attrs['position'])
-        except ParseError as e:
-            errors['position'] = str(e)
-        if errors:
-            raise exceptions.ParseError(errors)
-        return attrs
-
-
-class UserRegistrationSerializer(UserValidation, serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    email = serializers.CharField(required=False)
-    phone = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'phone',
-            'surname',
-            'name',
-            'patronymic',
-            'password',
-            'position',
-        )
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'surname',
-        )
-
-
-class UserDetailSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     citizenship = CitizenshipSerializer()
+    fellow_travelers = TravelerListSerializer(many=True)
 
     class Meta:
         model = User
@@ -116,22 +33,53 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'citizenship',
             'sex',
             'date_of_birth',
+            'mail_confirmed',
+            'password',
+            'fellow_travelers',
         )
+        read_only_fields = ('id', 'date_joined', 'mail_confirmed', 'fellow_travelers')
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+        optional_fields = ('email', 'phone', 'sex', 'date_of_birth', 'citizenship', 'patronymic', 'image')
 
+    def to_capitalize(self, attrs: Dict, fields: List[str]) -> Dict:
+        for key, value in attrs.items():
+            if key in fields:
+                attrs[key] = value.capitalize()
+        return attrs
 
-class UserUpdateSerializer(UserValidation, serializers.ModelSerializer):
-    email = serializers.CharField()
+    def validate_email(self, value):
+        if len(value.split('@')) != 2:
+            raise exceptions.ParseError('Неверный формат почты.')
+        if value in User.objects.values_list('email', flat=True):
+            raise exceptions.ValidationError('Почта уже зарегистрирована.')
+        return value
 
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'phone',
-            'surname',
-            'name',
-            'patronymic',
-            'image',
-        )
+    def validate_phone(self, value):
+        if not re.match(r'^\+?1?\d{9,15}$', value):
+            raise exceptions.ParseError(
+                {'phone': 'Неправильный номер телефона. Он должен содержать от 9 до 15 цифр, начиная с кода страны.'}
+            )
+        if value in User.objects.values_list('phone', flat=True):
+            raise exceptions.ValidationError('Телефон уже зарегистрирован.')
+        return value
+
+    def validate_position(self, value):
+        user = self.context.get('request').user
+        if value not in (get_owner_position(), get_user_position()) and user.position.code != get_admin_position():
+            raise ValidationError('Неверная роль.')
+
+        if self.instance == user and value == get_admin_position():
+            return ValidationError('Нельзя снять себя с роли администратора.')
+
+        return value
+
+    def validate(self, attrs):
+        return self.to_capitalize(attrs, ['surname', 'name', 'patronymic'])
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
         if validated_data.get('email'):
@@ -146,90 +94,39 @@ class ActivateEmailSerializer(serializers.Serializer):
     def validate(self, attrs):
         user_code = attrs['code']
         user = self.context.get('request').user
-        backend_code = EmailActivate.objects.filter(user=user)
-        if backend_code.exists() and user_code == backend_code.first().code:
+        backend_code = EmailActivate.objects.filter(user=user).first()
+        if backend_code and user_code == backend_code.code:
             return attrs
         raise ParseError('Неверный код')
 
-    def create(self, validated_data):
-        user = self.context.get('request').user
-        backend_code = EmailActivate.objects.filter(user=user)
-        if backend_code.exists():
-            backend_code.delete()
-            user.mail_confirmed = True
-            user.save()
-        return validated_data
 
-
-class SetImageUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'image',
-        )
-
-
-class ChangePositionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'position',
-            'password',
-        )
-
-    def validate(self, attrs):
-        password = attrs.pop('password')
-        user = self.context['request'].user
-
-        if not user.check_password(password):
-            raise serializers.ValidationError('Неверный пароль')
-
-        return attrs
-
-    def update(self, instance, validated_data):
-        if self.context['request'].user == instance:
-            raise serializers.ValidationError('Вы не можете изменять роль себе')
-
-        instance.position = validated_data.get('position', instance.position)
-        instance.save()
-        return instance
-
-
-class ChangePasswordSerializer(serializers.ModelSerializer):
+class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
     old_password2 = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
 
-    class Meta:
-        model = User
-        fields = (
-            'old_password',
-            'old_password2',
-            'new_password',
-        )
-
     def password_validate(self, old_password, old_password2):
-        user = self.context.get('request').user
         if old_password != old_password2:
-            print(old_password, old_password2)
-            raise exceptions.ParseError('Неверные пароли')
+            raise exceptions.ValidationError('Пароли не совпадают')
 
-        if not user.check_password(old_password):
-            raise ParseError('Текущий пароль неверен')
+        if not self.context.get('user').check_password(old_password):
+            raise ValidationError('Текущий пароль неверен')
 
-    def update(self, instance, validated_data):
-        user = self.context.get('request').user
-        new_password = validated_data.get('new_password')
-        old_password = validated_data.get('old_password')
-        old_password2 = validated_data.get('old_password2')
+    def validate(self, attrs):
+        self.password_validate(attrs.get('old_password'), attrs.get('old_password2'))
+        return attrs
 
-        self.password_validate(old_password, old_password2)
-
+    def validate_new_password(self, value):
         try:
-            validate_password(new_password)
+            validate_password(value)
         except django_exceptions.ValidationError as e:
-            raise ParseError(e)
+            error_list = []
+            for error in e.error_list:
+                error_message = error.message
 
-        user.set_password(new_password)
-        user.save()
-        return instance
+                if hasattr(error, 'params') and error.params:
+                    error_message = error_message % error.params
+                error_list.append(error_message)
+
+            raise ValidationError(error_list)
+        return value

@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.db.models import QuerySet
 from rest_framework.request import Request
-
+from django.utils.translation import gettext_lazy as _
 from users.models.managers import CustomUserManager
 
 
@@ -47,10 +47,15 @@ class BaseUser(models.Model):
 class User(BaseUser, AbstractUser):
     username = None
     email = models.EmailField(
-        verbose_name='Почта', unique=True
+        verbose_name='Почта', unique=True, error_messages={
+            'unique': 'Данная почта занята.',
+        }
     )
     phone = models.CharField(
         verbose_name='Номер телефона', unique=True, blank=True, null=True,
+        error_messages={
+            'unique': 'Данный номер телефона занят.',
+        }
     )
     position = models.ForeignKey(
         'Position', verbose_name='Должность',

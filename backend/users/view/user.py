@@ -81,23 +81,15 @@ User = get_user_model()
     ),
     change_password=extend_schema(
         summary='Поменять пароль',
-        tags=['Пользователи']
+        tags=['Пользователи'],
+        request=user_serializers.ChangePasswordSerializer,
+        responses={200: user_serializers.ChangePasswordSerializer}
     )
 )
 class UserView(CRUDViewSet):
     queryset = User.objects.all()
-    multi_serializer_class = {
-        'create': user_serializers.UserRegistrationSerializer,
-        'list': user_serializers.UserListSerializer,
-        'retrieve': user_serializers.UserDetailSerializer,
-        'partial_update': user_serializers.UserUpdateSerializer,
-        'activate_email': user_serializers.ActivateEmailSerializer,
-        'profile': user_serializers.UserDetailSerializer,
-        'set_image': user_serializers.SetImageUserSerializer,
-        'change_position': user_serializers.ChangePositionSerializer,
-        'users_travelers': traveler_serializers.UserTravelersSerializer,
-        'change_password': user_serializers.ChangePasswordSerializer,
-    }
+    serializer_class = user_serializers.UserSerializer
+
     multi_permission_classes = {
         'create': (AllowAny,),
         'list': (custom_permissions.IsAdmin,),
@@ -125,9 +117,7 @@ class UserView(CRUDViewSet):
 
     pagination_class = BasePagination
 
-    @action(
-        detail=False, methods=['get']
-    )
+    @action(detail=False, methods=['get'])
     def send_code(self, request, *args, **kwargs):
         def generate_code():
             EmailActivate.objects.create(
@@ -144,24 +134,26 @@ class UserView(CRUDViewSet):
         code = secrets.token_hex(3)
         try:
             generate_code()
-        except IntegrityError as e:
+        except IntegrityError:
             EmailActivate.objects.filter(user=user).first().delete()
             generate_code()
         return Response(status=status.HTTP_200_OK)
 
-    @action(
-        detail=False, methods=['post']
-    )
+    @action(detail=False, methods=['post'])
     def activate_email(self, request, *args, **kwargs):
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data, context={'request': request})
+        serializer = user_serializers.ActivateEmailSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
 
-    @action(
-        detail=False, methods=['get']
-    )
+        backend_code = EmailActivate.objects.filter(user=request.user).first()
+
+        if backend_code:
+            backend_code.delete()
+            request.user.mail_confirmed = True
+            request.user.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
     def profile(self, request, *args, **kwargs):
         user = request.user
         if user.is_authenticated:
@@ -169,49 +161,13 @@ class UserView(CRUDViewSet):
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(
-        detail=True, methods=['post']
-    )
-    def set_image(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(instance=user, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        detail=True, methods=['post']
-    )
-    def change_position(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance=instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        detail=True, methods=['get']
-    )
-    def get_user_favorites(self, request, *args, **kwargs):
-        user = self.get_object()
-        user_objects = FavoritesObjectListSerializer(
-            user.get_favorites(), many=True
-        )
-        return Response(status=status.HTTP_200_OK, data=user_objects.data)
-
-    @action(
-        detail=False, methods=['get']
-    )
-    def users_travelers(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    @action(
-        detail=False, methods=['post']
-    )
+    @action(detail=False, methods=['post'])
     def change_password(self, request, *args, **kwargs):
-        serializer = self.get_serializer(instance=request.user, data=request.data)
+        serializer = user_serializers.ChangePasswordSerializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+
+        request.user.set_password(serializer.data.get('new_password'))
+        request.user.save()
         return Response(status=status.HTTP_200_OK)
 
 
