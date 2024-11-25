@@ -1,19 +1,37 @@
 <script>
-export let name = 'Ivan'
-export let surname = 'Ivanov'
-export let birthdate = '19.04.2005'
+    import axios from "axios";
+    import Cookies from 'js-cookie'; 
 
+    export let userTravelers
+    const [year, month, day] = userTravelers.date_of_birth.split('-');
+    let isDeleted = true;
+
+    async function deleteCompanuon(){
+        try{
+            await axios.delete(`http://127.0.0.1:8000/api/travelers/${userTravelers.id}/`, {
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get("token")}`,
+               }
+            })
+            isDeleted = false;
+        }catch(error){
+            
+        }
+    }
 </script>
 
-<main>
-    <h1>{name.toUpperCase()} {surname.toUpperCase()}</h1>
-    <p id="birthdate">Дата рождения: <br>
-        {birthdate}
-    </p>
-    <hr>
-    <p id="edit">Редактировать</p>
-    <p id="delete">Удалить</p>
-</main>
+{#if isDeleted}
+    <main>
+        <h1>{userTravelers.name} {userTravelers.surname}</h1>
+        <p id="birthdate">Дата рождения: <br>
+            {day}.{month}.{year}
+        </p>
+        <hr>
+        <p id="edit">Редактировать</p>
+        <p id="delete" on:click={deleteCompanuon} >Удалить</p>
+    </main>
+{/if}
 
 <style>
     main{

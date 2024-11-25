@@ -2,12 +2,16 @@
     import mainPhoto from '../../../assets/main-photo.png';
     import mainPhotoBlur from '../../../assets/blur.png';
     import Search from './search.svelte';
+    import Calendar from './Calendar.svelte';
 </script>
 
 <main>
     <div class="photo">
             <div class="blur"></div>
         <div class="block">
+            <!-- <div class="bl">
+                <Calendar />
+            </div> -->
             <h1>Ваш идеальный отдых начинается здесь!</h1>
             <Search/>
         </div>
@@ -15,6 +19,10 @@
 </main>
 
 <style>
+    .bl{
+        width: 300px;
+    }
+
     .blur{
         position: relative;
         width: 100%;

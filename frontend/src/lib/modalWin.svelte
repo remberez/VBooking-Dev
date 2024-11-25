@@ -3,8 +3,7 @@
   import axios from 'axios';
   import { Route, Router, navigate } from 'svelte-routing';
   import { addToFavorites, getFavorites, clearFavorites } from './Router/scripts/favorites.js'
-  import Cookies from 'js-cookie'; // Импортируем библиотеку для работы с куками
-
+  import Cookies from 'js-cookie'; 
   export let isOpenLog = false;
   let isReg = false;
   let isLog = true;
@@ -28,7 +27,6 @@
   let errorPhone = '';
   let errorPassword = '';
 
-  // Получение токена из куки при загрузке страницы
   onMount(() => {
     token = Cookies.get('token');
     refreshToken = Cookies.get('refreshToken');
@@ -97,25 +95,26 @@
     resetErrors();
 
     try {
-        const response = await axios.post('http://localhost:8000/api/auth/jwt/create/', {
-            email,
-            password
-        });
+      const response = await axios.post('http://localhost:8000/api/auth/jwt/create/', {
+        email,
+        password
+      });
 
-        token = response.data.access;
-        refreshToken = response.data.refresh;
+      localStorage.setItem("pass", password)
+      localStorage.setItem("email", email)
 
-        Cookies.set('token', token, { expires: 7 });
-        Cookies.set('refreshToken', refreshToken, { expires: 7 });
+      token = response.data.access;
+      refreshToken = response.data.refresh;
 
-        await makeRequest();
-        const userId = 1 
-        await addFavoritesToUser(userId); 
-        navigate('/profile');
+      Cookies.set('token', token,  { expires: 7, path: '/' });
+      Cookies.set('refreshToken', refreshToken,  { expires: 7, path: '/' });
+
+      await makeRequest();
+      navigate('/profile');
     } catch (error) {
-        console.log(error);
+      console.error('Ошибка входа:', error.response.data);
     }
-}
+  }
 
 async function addFavoritesToUser(userId) {
     const favorites = getFavorites();
@@ -134,19 +133,17 @@ async function addFavoritesToUser(userId) {
 async function makeRequest() {
     try {
       const headers = {
-        Authorization: `Bearer ${Cookies.get("token")}` 
-      }
-      // Получаем данные пользователя после входа
-      const response = await axios.get('http://localhost:8000/api/users/profile/', {
-        headers
-      });
-
-      Cookies.set("info", JSON.stringify(response.data), { expires: 7 }); // Сохраняем данные пользователя в куки
+        Authorization: `Bearer ${Cookies.get("token")}`
+      };
+      const response = await axios.get('http://localhost:8000/api/users/profile/', { headers });
+      Cookies.set("info", JSON.stringify(response.data), { expires: 7 });
+      localStorage.setItem("info", response.data)
+      return response.data.id;
     } catch (error) {
       console.error('Ошибка при выполнении запроса:', error.response.status);
       if (error.response.status === 401) {
         await refreshTokenFunc(); // Обновляем токен
-        return makeRequest();
+        return await makeRequest(); // Повторяем запрос
       } else {
         throw error;
       }
@@ -157,15 +154,14 @@ async function makeRequest() {
   async function refreshTokenFunc() {
     try {
       const response = await axios.post('http://localhost:8000/api/auth/jwt/refresh/', {
-        refresh: refreshToken
+        refresh: Cookies.get("refreshToken")
       });
 
-      token = response.data.token;
+      token = response.data.access;
       Cookies.set('token', token, { expires: 7 }); // Обновляем токен в куки
     } catch (error) {
       console.error('Ошибка обновления токена:', error.response.data);
-      // Если ошибка обновления токена, необходимо перенаправить пользователя на страницу входа
-      navigate('/');
+      navigate('/'); // Перенаправляем при ошибке
     }
   }
 

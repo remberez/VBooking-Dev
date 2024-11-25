@@ -1,11 +1,13 @@
 <script>
     import { onMount } from 'svelte';
     import { useLocation } from 'svelte-routing';
+    import Cookies from 'js-cookie';
     import Header from '../Header.svelte';
     import { navigate } from 'svelte-routing';
     import axios from 'axios';
     import Objects from './Profile/object.svelte';
     import Search from './Main/search.svelte';
+    import DoubleRangeSlider from './Main/DoubleRangeSlider.svelte';
 
     let city = '';
     let adults = '';
@@ -26,6 +28,8 @@
     let filtersBlock
     let backFiltersBlock
     let tags = []
+
+    
 
     function openFiltersBlock(){
         if (openFilters) {
@@ -110,18 +114,19 @@
     }
 
     function updateFilteredApartments() {
-        filteredApartments = apartments.filter(apartment => {
-            const matchesCity = apartment.city === city;
-            const matchesMinPrice = apartment.minPrice >= selectedMinPrice;
-            const matchesMaxPrice = apartment.minPrice <= selectedMaxPrice;
+    filteredApartments = apartments.filter(apartment => {
+        const matchesCity = apartment.city === city;
+        const matchesMinPrice = apartment.minPrice >= +Cookies.get("min") || apartment.minPrice >= selectedMinPrice;
+        const matchesMaxPrice = apartment.minPrice <= +Cookies.get("max") || apartment.minPrice <= selectedMaxPrice;
 
-            return matchesCity && matchesMinPrice && matchesMaxPrice && matchesCategories && matchesTags;
-        });
+        return matchesCity && matchesMinPrice && matchesMaxPrice;
+    });
 
-        if (activeTab === "nerdeSea") {
-            filteredApartments.sort((a, b) => a.seaDistance - b.seaDistance);
-        }
+    if (activeTab === "nerdeSea") {
+        filteredApartments.sort((a, b) => a.seaDistance - b.seaDistance);
+     }
     }
+
 
     let activeTab = "popular";
     let tabOne, tabTwo, tabThree;
@@ -149,7 +154,7 @@
         kids = params.get('kids') || '';
 
         await fetchObjects(); 
-        updateFilteredApartments(); 
+        await updateFilteredApartments(); 
     });
 
     $: uniqueCategories = [...new Set(apartments.map(apartment => apartment.type))];
@@ -178,11 +183,15 @@
         <div bind:this={backFiltersBlock} class="blockFilters">
             <div bind:this={filtersBlock} class="priceList">
                 <div class="bablo">
-                    <h1>Цена за номер, руб.</h1> <p>от <span>{selectedMinPrice}</span> до <span>{selectedMaxPrice}</span></p>
                     <div class="blockProgress">
                         <div class="sliderContainer">
-                            <input type="range" min={minPrice} max={maxPrice} bind:value={selectedMinPrice} on:input={updateFilteredApartments} class="slider" />
-                            <input id="slidee" type="range" min={minPrice} max={maxPrice} bind:value={selectedMaxPrice} on:input={updateFilteredApartments} class="slider" />
+                            <DoubleRangeSlider 
+                                min={minPrice} 
+                                max={maxPrice} 
+                                selectedMinPrice={selectedMinPrice} 
+                                selectedMaxPrice={selectedMaxPrice} 
+                                on:input={updateFilteredApartments}
+                            />
                         </div>
                     </div>
                     <div class="blockChooseType">
@@ -254,10 +263,19 @@
 </main>
 
 <style>
+
+.blockChooseType h1{
+    font-size: 20px;
+}
+
 .sort svg{
     width: 40px;
     height: 40px;
     display: none;
+}
+
+.sliderContainer{
+    margin-bottom: 40px;
 }
 
 main{
@@ -276,7 +294,7 @@ main{
 
 .blockProgress {
     width: 100%; 
-    margin: 20px 0; 
+    margin-bottom: 20px; 
     position: relative;
 }
 
@@ -309,31 +327,9 @@ input[type='range']::-webkit-slider-thumb {
     box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.3); /* Тень */
 }
 
-    .bablo span{
-        color: #777777;
-        background: #F5F5F5;
-        border: 2px solid #D9D9D9;
-        border-radius: 10px;
-        padding: 2px 20px 2px 5px;
-    }
-
     .blockProgress{
         display: flex;
         flex-direction: column;
-    }
-
-    .bablo h1{
-        margin-bottom: 5px;
-        font-size: 20px;
-        font-weight: 400;
-        line-height: 23.7px;
-    }
-
-    .bablo p{
-        font-size: 18px;
-        font-weight: 300;
-        line-height: 23.7px;
-        word-spacing: 5px;
     }
 
     .blockSorry{

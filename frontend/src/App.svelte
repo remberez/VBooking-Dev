@@ -25,8 +25,6 @@
 
 <main>
   <Router>
-
-    
       <Route path="">
         <div class="mass two">
           <Header/>
@@ -49,11 +47,6 @@
         <Search/>
       </div>
 
-    </Route>
-
-    <Route path='/profileOld'>
-      <Loader/>
-      <Profile/>
     </Route>
 
     <Route path='/profile'>

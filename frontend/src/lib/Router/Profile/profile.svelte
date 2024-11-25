@@ -9,19 +9,80 @@
 
     import Companion from './companion.svelte';
     import AddCompanion from './addCompanion.svelte';
-    import Object from './object.svelte';
+    import Objects from './object.svelte';
+
 
     let userInfo;
     let showUserInfo = false;
-    const info = JSON.parse(Cookies.get('info') || '{}');
-    let { surname, name, email, phone, position, id } = info;
-    let gender = 'Мужчина';
+
+    let sex = 'Мужчина';
     let url = 'http://127.0.0.1:8000/api/'
     let favotitsOBJ = []
+    let travelers = []
 
-    console.log(info)
+    //passwords
+    let old_password
+    let old_password2
+    let new_password
+    let responseLogResPassword = ""
+    let logPassword
 
-    console.log(Cookies.get('token'))
+    //images
+    let responseLogimages = ''
+    let logImages
+    let titleImage
+
+    //settings
+    let logSettingsProfile, responseLogSettingsProfile = ""
+
+    let access, refresh
+
+    let info = {}
+    let cloneInfo = {}
+    // const info = JSON.parse(Cookies.get('info') || '{}');
+
+    let  surname,
+         name, 
+         email, 
+         phone, 
+         position, 
+         id , 
+         patronymic,
+         image,
+         date_of_birth,
+         password
+
+         
+
+    async function makeRequest() {
+    try {
+      const headers = {
+        Authorization: `Bearer ${access}`
+      };
+      const response = await axios.get('http://localhost:8000/api/users/profile/', { headers });
+      info = response.data
+      let  {surname,
+         name, 
+         email, 
+         phone, 
+         position, 
+         id , 
+         patronymic,
+         image,
+         date_of_birth,
+         password} = info
+         cloneInfo = {...info}
+      return response.data.id;
+    } catch (error) {
+      console.error('Ошибка при выполнении запроса:', error.response.status);
+      if (error.response.status === 401) {
+        await refreshTokenFunc(); 
+        return await makeRequest(); 
+      } else {
+        throw error;
+      }
+    }
+  }
 
     const toggleUserInfo = () => {
         showUserInfo = !showUserInfo;
@@ -29,6 +90,233 @@
             userInfo.style.display = showUserInfo ? 'block' : 'none';
         }
     };
+
+    async function editProfile() {
+        const updatedData = {};
+
+        if (phone !== cloneInfo.phone) {
+            updatedData.phone = cloneInfo.phone; 
+            console.log("Номер телефона был изменен");
+        }
+
+        if (email !== cloneInfo.email) {
+            updatedData.email = cloneInfo.email; 
+            console.log("Почта была изменена");
+        }
+
+        if (surname !== cloneInfo.surname) {
+            updatedData.surname = cloneInfo.surname; 
+        }
+
+        if (name !== cloneInfo.name) {
+            updatedData.name = cloneInfo.name; 
+        }
+
+        if (sex !== cloneInfo.sex) {
+            updatedData.sex = cloneInfo.sex; 
+        }
+
+        if (cloneInfo.date_of_birth && date_of_birth !== cloneInfo.date_of_birth) {
+            updatedData.date_of_birth = cloneInfo.date_of_birth; 
+            console.log("Дата рождения была изменена");
+        }
+
+        if (patronymic !== cloneInfo.patronymic) {
+            updatedData.patronymic = cloneInfo.patronymic; 
+        }
+
+        if (Object.keys(updatedData).length === 0) {
+            console.log("Нет изменений для сохранения.");
+            return;
+        }
+
+        try {
+            const response = await axios.patch(`http://127.0.0.1:8000/api/users/${cloneInfo.id}/`, updatedData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`,
+                },
+            });
+      
+                if (response.status === 200) {
+                    responseLogSettingsProfile = "Пароль успешно изменен!";
+
+                    Object.assign(logSettingsProfile.style, {
+                        opacity: 1,
+                        color: "green"
+                    });
+
+                    setTimeout(() => {
+                        Object.assign(logSettingsProfile.style, {
+                            opacity: 0
+                        });
+                    }, 3000);
+                } else {
+                    responseLogResPassword = "Текущий пароль неверен";
+                }
+            
+
+            console.log("Профиль успешно обновлен:", response.data)
+            info = response.data  
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                await refreshTokenFunc(); 
+                await editProfile();
+            }
+            responseLogSettingsProfile = "Ошибка при изменении данных! Возможно почта или номер телефона уже зарегистрирован"
+            
+            Object.assign(logSettingsProfile.style, {
+                        opacity: 1,
+                        color: "red"
+                    });
+
+                    setTimeout(() => {
+                        Object.assign(logSettingsProfile.style, {
+                            opacity: 0
+                        });
+                    }, 3000);
+            console.error("Ошибка при изменении данных пользователя", error.response);
+        }
+    }
+
+    async function updateImages() {
+    const file = titleImage.files[0]; 
+    if (file) {
+        try {
+            console.log(file); // Для отладки
+
+            const formData = new FormData();
+            formData.append('image', file); // 'image' - имя поля, ожидаемое на сервере
+
+            // Отправка файла на сервер
+            const response = await axios.post(`http://127.0.0.1:8000/api/users/${cloneInfo.id}/set_image/`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', 
+                    'Authorization': `Bearer ${access}`, 
+                },
+            });
+
+            console.log("Изображение успешно обновлено:", response.data);
+        } catch (error) {
+            if (error.response.status === 401) {
+                await refreshTokenFunc();
+                await updateImages(); 
+            }
+            console.error("Ошибка при изменении фото профиля", error.response);
+        }
+    } else {
+        console.error("Файл не выбран");
+    }
+}
+
+    
+    async function setNewPassword() {
+    try {
+        const response = await axios.post(`http://127.0.0.1:8000/api/users/change_password/`, {
+            old_password,
+            old_password2,
+            new_password,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${access}`,
+            }
+        });
+
+        if (response.status === 200) {
+            responseLogResPassword = "Пароль успешно изменен!";
+            // Сброс значений
+            old_password = '';
+            old_password2 = '';
+            new_password = '';
+
+            Object.assign(logPassword.style, {
+                opacity: 1,
+                color: "green"
+            });
+
+            setTimeout(() => {
+                Object.assign(logPassword.style, {
+                    opacity: 0
+                });
+            }, 3000);
+        } else {
+            responseLogResPassword = "Текущий пароль неверен";
+        }
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            console.error("Токен истек, пытаемся обновить его.");
+            await refreshTokenFunc(); 
+            await setNewPassword();
+            
+            if(error.response.status === 400) {
+                responseLogResPassword = "Не удалось обновить токен, пожалуйста, войдите снова.";
+                Object.assign(logPassword.style, {
+                opacity: 1,
+                color: "red",
+            });
+
+            setTimeout(() => {
+                Object.assign(logPassword.style, {
+                    opacity: 0,
+                });
+            }, 3000);
+            }
+
+        } else {
+            responseLogResPassword = "Ошибка при смене пароля: " + (error.response?.data?.detail || "Неизвестная ошибка");
+            Object.assign(logPassword.style, {
+                opacity: 1,
+                color: "red"
+            });
+
+            setTimeout(() => {
+                Object.assign(logPassword.style, {
+                    opacity: 0
+                });
+            }, 3000);
+            console.error("Ошибка при смене пароля:", error.response);
+        }
+    }
+}
+
+async function refreshTokenFunc() {
+    console.log('Токен обновления:', refresh); 
+
+    if (!refresh) {
+        console.warn('Токен обновления отсутствует.');
+        return;
+    }
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/api/auth/jwt/refresh/', {
+            refresh: refresh
+        });
+        console.log('Новый токен:', response.data);
+        access = response.data.access
+    } catch (error) {
+        console.error('Ошибка обновления токена:', error.response?.data || error.message);
+        if (error.response && error.response.data.code === 'token_not_valid') {
+        }
+    }
+}
+
+  // Логин
+  async function loginUser() {
+    try {
+      const response = await axios.post('http://localhost:8000/api/auth/jwt/create/', {
+           email: localStorage.getItem("email"),
+           password: localStorage.getItem("pass")
+      });
+
+      access = response.data.access
+      refresh = response.data.refresh
+
+      await makeRequest();
+
+    } catch (error) {
+      console.error('Ошибка входа:', error.response.data);
+    }
+  }
 
     async function getFavorites() {
         try {
@@ -56,73 +344,6 @@
         }
     }
 
-    let selectedImage; // Переменная для хранения загруженного изображения
-    async function toEditUser() {
-    const updatedData = {
-        email,
-        phone,
-        surname,
-        name,
-        patronymic: '',
-    };
-
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('phone', phone);
-    formData.append('surname', surname);
-    formData.append('name', name);
-    formData.append('patronymic', '');
-    if (selectedImage) {
-        formData.append('image', selectedImage);
-    }
-
-    try {
-        
-        const response = await axios.patch(`http://localhost:8000/api/users/${id}/`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${Cookies.get('token')}` 
-            },
-        });
-        if (imageUrl) {
-                await setImage(imageUrl);
-            }
-        console.log('Данные пользователя успешно обновлены:', response.data);
-    } catch (error) {
-        console.error("Ошибка изменения данных пользователя:", error.response);
-    }
-}
-    
-let imageUrl
-
-function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                imageUrl = reader.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    async function setImage(imageUrl) {
-        try {
-            const response = await axios.post(`http://127.0.0.1:8000/api/users/${id}/set_image/`, {
-                image: imageUrl
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Cookies.get('token')}`, 
-                }
-            });
-            console.log('Изображение успешно обновлено:', response.data);
-        } catch (error) {
-            console.error("Ошибка обновления изображения:", error.response);
-        }
-    }
-
-
     const handleResize = () => {
         if (userInfo) { 
             userInfo.style.display = document.body.clientWidth > 769 ? 'block' : 'none'; 
@@ -143,9 +364,24 @@ function handleFileUpload(event) {
     onDestroy(() => window.removeEventListener('resize', handleResize));
     handleResize();
 
-    if (!Cookies.get("token")) {
-        navigate("/");
-        window.location.reload();
+    async function getUserTravelers() {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/travelers/`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`,
+                }
+            });
+            travelers = response.data;
+            console.log("Попутчики - ", travelers);
+        } catch (error) {
+            console.error('Ошибка поиска попутчиков:', error);
+            if (error.response && error.response.status === 401) {
+                console.error("Токен истек, пытаемся обновить его.");
+                const newToken = await refreshTokenFunc();
+                await getUserTravelers();
+            }
+        }
     }
 
     //Переключение страниц
@@ -160,8 +396,24 @@ function handleFileUpload(event) {
         localStorage.setItem("activeTab",tab);
     };
 
-    onMount(() =>{
-        getFavorites()
+    async function check() {
+        if (!access || !refresh) {
+                console.warn('Токены отсутствуют. Пользователь должен войти в систему.');
+                await loginUser()
+                return check()
+            } else {
+                console.log('Токены найдены:', { access, refresh });
+                await refreshTokenFunc()
+                
+            }
+    }
+
+    onMount(async () =>{
+        await check()
+        await makeRequest()
+        await getUserTravelers()
+        await getFavorites()
+        
     })
 </script>
 
@@ -179,7 +431,7 @@ function handleFileUpload(event) {
 
             <div class="user">
                 <div bind:this={userInfo} class="userInfo max">
-                    <p id="email">{email}</p>
+                    <p id="email">{cloneInfo.email}</p>
                     <a id="profileEdite" on:click={() => switchTab('settingsProfile')}>Настроить профиль</a>
                     <hr id="line">
                     <div class="userChoose">
@@ -192,25 +444,30 @@ function handleFileUpload(event) {
 
                 <div class="userSettings">
                     {#if activeTab === 'settingsProfile'}
-                    <div class="addUserInfo">
-                        <h1>Настройка профиля</h1>
+                    <div class="addUserInfo" on:submit|preventDefault={editProfile}>
+                            <h1>Настройка профиля</h1> <p style="transition: 0.3s;" bind:this = {logSettingsProfile}>{responseLogSettingsProfile}</p> 
                         <p>Введите свои данные, для автоматического заполнения при бронировании.</p>
 
-                        <form id="settingsUser" on:submit|preventDefault={toEditUser}>
+                        <form id="settingsUser" >
                             <div class="block">
                                 <div class="input">
-                                    <input type="text" bind:value={surname} id="surname" placeholder=" " required>
+                                    <input type="text" bind:value={cloneInfo.surname} id="surname" placeholder=" " required>
                                     <label for="surname">Фамилия</label>
                                 </div>
+
                                 <div class="input">
-                                    <input type="text" bind:value={name} id="name" placeholder=" " required>
+                                    <input type="text" bind:value={cloneInfo.patronymic} id="surname" placeholder=" " required>
+                                    <label for="surname">Отчество</label>
+                                </div>
+                                <div class="input">
+                                    <input type="text" bind:value={cloneInfo.name} id="name" placeholder=" " required>
                                     <label for="name">Имя</label>  
                                 </div>
                             </div>
                         
                             <div class="block">
                                 <div class="input">
-                                    <input type="date"  id="birthdate" required>
+                                    <input type="date" bind:value={cloneInfo.date_of_birth} id="birthdate" required>
                                     <label for="birthdate">Дата рождения</label>
                                 </div>
                                 <div class="input">
@@ -220,66 +477,68 @@ function handleFileUpload(event) {
                             </div>
                         
                             <label id="gender">
-                                <input type="radio" bind:group={gender} value="Мужчина" checked /> Мужчина
-                                <input type="radio" bind:group={gender} value="Женщина" /> Женщина
+                                <input type="radio" bind:group={cloneInfo.sex} value="Мужчина" checked /> Мужчина
+                                <input type="radio" bind:group={cloneInfo.sex} value="Женщина" /> Женщина
                             </label>
                         
                             <div class="block">
                                 <div class="input">
-                                    <input type="text" bind:value={phone} id="phone" placeholder=" " required>
+                                    <input type="text" bind:value={cloneInfo.phone} id="phone" placeholder=" " required>
                                     <label for="phone">Номер Телефона</label>
                                 </div>
                                 <div class="input">
-                                    <input type="text" bind:value={email} id="emailInput" placeholder=" " required>
+                                    <input type="text" bind:value={cloneInfo.email} id="emailInput" placeholder=" " required>
                                     <label for="emailInput">Эл Почта</label>  
                                 </div>
-
-
- 
-
                             </div>
                             <button id="save" type="submit">Сохранить</button>
                         </form>
                         <hr style="margin-bottom: 20px;">
                     </div>
 
-                    <div class="blockAddPhoto">
+                    <div class="blockAddPhoto" on:submit|preventDefault={updateImages}>
                         <form>
+                            <span id="resPassMid">
+                                <h1>Фото профиля</h1> <p bind:this = {logImages}>{responseLogimages}</p>
+                            </span>
 
-                            <img src="{info.image}" alt="">
+                            <img src="{cloneInfo.image }" alt="">
+                            <input type="file" bind:this = {titleImage} accept="image/jpeg,image/png">
 
-                            <div class="input">
-                                <input type="file" on:change={handleFileUpload} accept="image/*" />
-                                <label for="imageInput">Загрузить изображение</label>
-                                <a on:click={setImage}>отправить фото</a>
-                            </div>
+                            <button id="updateimage">Загрузить фото</button>
+
                         </form>
                     </div>
 
                     <div class="blockCompanion">
                         <hr>
                         <div class="companions">
-                            <Companion/>
-                            <Companion/>
+                                {#each travelers as userTravelers}
+                                    <Companion {userTravelers}/>
+                                {/each}
                             <AddCompanion/>
                         </div>
                     </div>
 
                     <div class="blockResPassword">
                         <hr>
-                        <h1>Смена пароля</h1>
-                        <form class="formResPassword">
+                        <span id="resPassMid">
+                            <h1>Смена пароля</h1> <p bind:this = {logPassword}>{responseLogResPassword}</p>
+                        </span>
+                        <form class="formResPassword" 
+                        on:submit|preventDefault={setNewPassword}
+                        >
                             <div class="input">
-                                <input type="password" id="currentPassword" placeholder=" " required>
+                                <input type="password" bind:value={old_password} id="currentPassword" placeholder=" " required>
                                 <label for="currentPassword">Текущий пароль</label>
                             </div>
                             <div class="input">
-                                <input type="password" id="newPassword" placeholder=" " required>
-                                <label for="newPassword">Новый пароль</label>  
+                                <input type="password" bind:value={old_password2} id="newPassword" placeholder=" " required>
+                                <label for="newPassword">Повторите текущий пароль</label>  
                             </div>
                             <div class="input">
-                                <input type="password" id="repeatNewPassword" placeholder=" " required>
-                                <label for="repeatNewPassword">Повторите новый пароль</label>  
+                                <input type="password" bind:value={new_password} id="repeatNewPassword" placeholder=" " required>
+                                <label for="repeatNewPassword">Новый пароль</label>  
                             </div>
                             <button id="save">Изменить</button>
                         </form>
@@ -297,7 +556,7 @@ function handleFileUpload(event) {
 
                             <div class="blockFavorites">
                                 {#each favotitsOBJ as apartment}
-                                    <Object {apartment} />
+                                    <Objects {apartment} />
                                 {/each}
                             </div>
                         </div>
@@ -315,6 +574,19 @@ function handleFileUpload(event) {
 </main>
 
 <style>
+    #resPassMid p{
+        color: Green;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+    }
+
+    #resPassMid{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
     .userInfo, .userSettings {
         border-radius: 7px;
     }
@@ -333,12 +605,21 @@ function handleFileUpload(event) {
         color: black;
     }
 
-    .blockAddPhoto{
-        margin-top: 100px;
+    .blockAddPhoto img{
+        width: 200px;
+        height: 200px;
     }
 
     .blockAddPhoto a{
         background-color: aqua;
+    }
+
+    #updateimage{
+        background-color: var(--color);
+        color: white;
+        width: 137px;
+        height: 33px;
+        border-radius: 5px;
     }
 
     .blockFavorites{
@@ -610,6 +891,7 @@ function handleFileUpload(event) {
 
         #email {
             font-size: 14px;
+            overflow: hidden;
         }
 
         .addUserInfo h1 {
