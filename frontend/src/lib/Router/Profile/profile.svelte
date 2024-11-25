@@ -101,6 +101,7 @@
 
         if (email !== cloneInfo.email) {
             updatedData.email = cloneInfo.email; 
+            localStorage.setItem("email", updatedData.email)
             console.log("Почта была изменена");
         }
 
@@ -139,7 +140,7 @@
             });
       
                 if (response.status === 200) {
-                    responseLogSettingsProfile = "Пароль успешно изменен!";
+                    responseLogSettingsProfile = "Данные успешно изменнены!";
 
                     Object.assign(logSettingsProfile.style, {
                         opacity: 1,
@@ -163,7 +164,7 @@
                 await refreshTokenFunc(); 
                 await editProfile();
             }
-            responseLogSettingsProfile = "Ошибка при изменении данных! Возможно почта или номер телефона уже зарегистрирован"
+            responseLogSettingsProfile = "Ошибка! Возможно почта или номер телефона уже зарегистрирован"
             
             Object.assign(logSettingsProfile.style, {
                         opacity: 1,
@@ -445,7 +446,10 @@ async function refreshTokenFunc() {
                 <div class="userSettings">
                     {#if activeTab === 'settingsProfile'}
                     <div class="addUserInfo" on:submit|preventDefault={editProfile}>
-                            <h1>Настройка профиля</h1> <p style="transition: 0.3s;" bind:this = {logSettingsProfile}>{responseLogSettingsProfile}</p> 
+                            <span id="editProfff">
+                                <h1>Настройка профиля</h1>
+                                <p bind:this = {logSettingsProfile}>{responseLogSettingsProfile}</p> 
+                            </span> 
                         <p>Введите свои данные, для автоматического заполнения при бронировании.</p>
 
                         <form id="settingsUser" >
@@ -577,8 +581,23 @@ async function refreshTokenFunc() {
     #resPassMid p{
         color: Green;
         font-size: 13px;
+        opacity: 1;
+        transition: 0.3s;
+    }
+
+    #editProfff p{
+        color: green;
+        font-size: 13px;
         opacity: 0;
         transition: 0.3s;
+    }
+
+    #editProfff{
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 10px;
+        padding-bottom: 10px;
     }
 
     #resPassMid{
@@ -785,7 +804,6 @@ async function refreshTokenFunc() {
         font-size: 18px;
         font-weight: 400;
         line-height: 21.33px;
-        padding-bottom: 10px;
     }
 
     .addUserInfo p {
