@@ -4,7 +4,7 @@
     export let info = "Skoda рассекретила новый ультрадешевый кроссовер";
 </script>
 
-<main class="animate__animated wow animate__fadeInDown">
+<main class="animate__animated wow animate__fadeInUp">
     <img src={hrefs} alt="">
 
     <section>

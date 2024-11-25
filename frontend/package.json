@@ -21,6 +21,7 @@
   "dependencies": {
     "@auth/sveltekit": "^1.7.2",
     "@sveltejs/adapter-auto": "^3.3.1",
+    "svelte-calendar": "^1.0.0",
     "@sveltejs/kit": "^2.7.4",
     "axios": "^1.7.7",
     "jquery": "^3.7.1",

@@ -1,8 +1,12 @@
 {
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "svelte": "^5.2.7",
+    "svelte-calendar": "^3.1.6",
+    "svelte-check": "^4.1.0"
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "yootils": "^0.3.1"
   }
 }

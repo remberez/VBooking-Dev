@@ -26,6 +26,8 @@
   let errorEmail = '';
   let errorPhone = '';
   let errorPassword = '';
+  let valid, validLog = ''
+
 
   onMount(() => {
     token = Cookies.get('token');
@@ -113,6 +115,18 @@
       navigate('/profile');
     } catch (error) {
       console.error('Ошибка входа:', error.response.data);
+      validLog = "Не верный логин или пароль"
+
+      Object.assign(valid.style,{
+        opacity : 1,
+        transition : "0.3s",
+        color : "red",
+      })
+      setTimeout(() => {
+          Object.assign(valid.style, {
+          opacity : 0,
+        });
+      }, 3000);
     }
   }
 
@@ -172,16 +186,18 @@ async function makeRequest() {
     <div class="modal-content">
       <div class="block">
         <span class="close" on:click={close}>&times;</span>
-
+ 
         {#if isLog}
-          <h2>Вход</h2>
+        <div class="validLog">
+          <p id="validLog" bind:this = {valid}>{validLog}</p>
+          <h2>Вход</h2> 
+        </div>
         {/if}
-
+      
         {#if isReg}
           <h2>Регистрация</h2>
         {/if}
       </div>
-
       {#if isReg}
       <div class="chooseReg">
         <button class="role-button" on:click={chooseUser}>Пользователь</button>  
@@ -258,6 +274,23 @@ async function makeRequest() {
   </div>
 {/if}
 <style>
+  .validLog{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #validLog{
+    text-align: center;
+    color: red;
+    font-size: 13px;
+  }
+
+  .block h2{
+    font-size: 25px;
+  }
+
   form {
     width: 100%; 
   }

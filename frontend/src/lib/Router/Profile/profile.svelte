@@ -31,6 +31,7 @@
     let responseLogimages = ''
     let logImages
     let titleImage
+     let imageUrl = ''
 
     //settings
     let logSettingsProfile, responseLogSettingsProfile = ""
@@ -152,8 +153,6 @@
                             opacity: 0
                         });
                     }, 3000);
-                } else {
-                    responseLogResPassword = "Текущий пароль неверен";
                 }
             
 
@@ -181,16 +180,16 @@
     }
 
     async function updateImages() {
-    const file = titleImage.files[0]; 
+    const file = titleImage.files[0]; // Получаем файл из элемента input
     if (file) {
         try {
-            console.log(file); // Для отладки
+            console.log("Отправляем файл:", file); // Для отладки
 
             const formData = new FormData();
-            formData.append('image', file); // 'image' - имя поля, ожидаемое на сервере
+            formData.append('image', file); // Добавляем файл к FormData
 
             // Отправка файла на сервер
-            const response = await axios.post(`http://127.0.0.1:8000/api/users/${cloneInfo.id}/set_image/`, formData, {
+            const response = await axios.patch(`http://127.0.0.1:8000/api/users/${cloneInfo.id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data', 
                     'Authorization': `Bearer ${access}`, 
@@ -198,18 +197,42 @@
             });
 
             console.log("Изображение успешно обновлено:", response.data);
+            responseLogimages = "Изображение успешно обновлено"; // Обновление сообщения
+            Object.assign(titleImage.style, {
+                opacity: 1,
+                color: "green"
+            });
+
+            setTimeout(() => {
+                Object.assign(titleImage.style, {
+                    opacity: 0
+                });
+            }, 3000);
+            
         } catch (error) {
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
                 await refreshTokenFunc();
                 await updateImages(); 
+            } else {
+                console.error("Ошибка при изменении фото профиля", error.response);
+                responseLogimages = "Ошибка при изменении фото профиля"; 
+                Object.assign(titleImage.style, {
+                    opacity: 1,
+                    color: "red"
+                });
+
+                setTimeout(() => {
+                    Object.assign(titleImage.style, {
+                        opacity: 0
+                    });
+                }, 3000);
             }
-            console.error("Ошибка при изменении фото профиля", error.response);
         }
     } else {
         console.error("Файл не выбран");
+        responseLogimages = "Файл не выбран"; 
     }
 }
-
     
     async function setNewPassword() {
     try {
@@ -460,13 +483,15 @@ async function refreshTokenFunc() {
                                 </div>
 
                                 <div class="input">
-                                    <input type="text" bind:value={cloneInfo.patronymic} id="surname" placeholder=" " required>
-                                    <label for="surname">Отчество</label>
-                                </div>
-                                <div class="input">
                                     <input type="text" bind:value={cloneInfo.name} id="name" placeholder=" " required>
                                     <label for="name">Имя</label>  
                                 </div>
+
+                                <div class="input">
+                                    <input type="text" bind:value={cloneInfo.patronymic} id="surname" placeholder=" " required>
+                                    <label for="surname">Отчество</label>
+                                </div>
+
                             </div>
                         
                             <div class="block">
@@ -485,34 +510,40 @@ async function refreshTokenFunc() {
                                 <input type="radio" bind:group={cloneInfo.sex} value="Женщина" /> Женщина
                             </label>
                         
-                            <div class="block">
-                                <div class="input">
-                                    <input type="text" bind:value={cloneInfo.phone} id="phone" placeholder=" " required>
-                                    <label for="phone">Номер Телефона</label>
+                            <div class="blockWhisPhoto">
+                                <div class="block pht">
+                                    <div class="input">
+                                        <input type="text" bind:value={cloneInfo.phone} id="phone" placeholder=" " required>
+                                        <label for="phone">Номер Телефона</label>
+                                    </div>
+                                    <div class="input">
+                                        <input type="text" bind:value={cloneInfo.email} id="emailInput" placeholder=" " required>
+                                        <label for="emailInput">Эл Почта</label>  
+                                    </div>
+
+                                    <button id="save" type="submit">Сохранить</button>
                                 </div>
-                                <div class="input">
-                                    <input type="text" bind:value={cloneInfo.email} id="emailInput" placeholder=" " required>
-                                    <label for="emailInput">Эл Почта</label>  
+    
+    
+    
+                                <div class="blockAddPhoto">
+                                    <form id="formImg" on:submit|preventDefault={updateImages}>
+                                        <span id="resPassMid">
+                                            <h1>Фото профиля</h1>
+                                            <p bind:this={titleImage}>{responseLogimages}</p>
+                                        </span>
+                                
+                                        <img id="imgProfile" src="{cloneInfo.image}" alt="Фото профиля">
+                                        <input type="file" bind:this={titleImage} accept="image/jpeg,image/png" required>
+                                        <button id="updateimage">Загрузить фото</button>
+                                    </form>
                                 </div>
                             </div>
-                            <button id="save" type="submit">Сохранить</button>
                         </form>
                         <hr style="margin-bottom: 20px;">
                     </div>
 
-                    <div class="blockAddPhoto" on:submit|preventDefault={updateImages}>
-                        <form>
-                            <span id="resPassMid">
-                                <h1>Фото профиля</h1> <p bind:this = {logImages}>{responseLogimages}</p>
-                            </span>
 
-                            <img src="{cloneInfo.image }" alt="">
-                            <input type="file" bind:this = {titleImage} accept="image/jpeg,image/png">
-
-                            <button id="updateimage">Загрузить фото</button>
-
-                        </form>
-                    </div>
 
                     <div class="blockCompanion">
                         <hr>
@@ -578,6 +609,37 @@ async function refreshTokenFunc() {
 </main>
 
 <style>
+    #formImg{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    #imgProfile{
+        width: 150px;
+        height: 150px;
+        border: 2px rgba(161, 161, 161, 0.411) solid;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    input[type=file]{
+        color:transparent;
+    }
+
+    .blockWhisPhoto{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .block.pht{
+        display: flex;
+        flex-direction: column;
+    }
+
     #resPassMid p{
         color: Green;
         font-size: 13px;
