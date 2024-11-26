@@ -2,14 +2,19 @@
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
     import axios from 'axios';
+    import Calendar from './Calendar.svelte';
+    import Calendarcopy from './Calendar copy.svelte';
+    import Cookies from 'js-cookie';
 
-    export let checkInDate = new Date().toISOString().split('T')[0];  // Устанавливаем дату заезда на сегодня
-    export let checkOutDate = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];  // Устанавливаем дату выезда на 7 дней позже
     export let city = '';
     export let adults = '';
-    export let width = 100
-    export let type = "%"
-    let availableCities = []; // Массив для хранения городов
+    let availableCities = [];
+
+    // Date
+    let checkInDate = Cookies.get("in") ? new Date(Cookies.get("in")).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];  
+    let checkOutDate = Cookies.get("out") ? new Date(Cookies.get("out")).toISOString().split('T')[0] : new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];  
+    let calendarIn = false;
+    let calendarOut = false;
 
     async function goToAboutPage(params) {
         navigate(`/search?${params}`);
@@ -18,7 +23,7 @@
     async function fetchCities() {
         try {
             const response = await axios.get('http://localhost:8000/api/city/'); 
-            availableCities = response.data.map(city => city.name)
+            availableCities = response.data.map(city => city.name);
         } catch (error) {
             console.error('Ошибка при получении городов:', error);
         }
@@ -45,6 +50,20 @@
             console.error('Ошибка при отправке данных:', error);
         }
     };
+
+    function toggleCalendarIn() {
+        calendarIn = !calendarIn;
+        calendarOut = false; // Закрываем календарь выезда
+    }
+
+    function toggleCalendarOut() {
+        calendarOut = !calendarOut;
+        calendarIn = false; // Закрываем календарь заезда
+    }
+
+    function handleCalendarClick(event) {
+        event.stopPropagation(); // Остановить всплытие события клика
+    }
 </script>
 
 <main>
@@ -54,25 +73,27 @@
             <select id="city" bind:value={city} required>
                 <option value="">Где хотите отдохнуть?</option>
                 {#each availableCities as availableCity}
-                <option value={availableCity}>{availableCity}</option>
+                    <option value={availableCity}>{availableCity}</option>
                 {/each}
             </select>
         </div>
 
         <div class="separator"></div>
 
-        <div class="input">
+        <div class="input" on:click={toggleCalendarIn}>
             <label for="">Заезд</label>
-            <input type="date" bind:value={checkInDate} class="date-input" />
+            <p>{new Date(checkInDate).toLocaleDateString()}</p>
+     
         </div>
 
         <div class="separator"></div>
 
-        <div class="input">
+        <div class="input" on:click={toggleCalendarOut}>
             <label for="">Выезд</label>
-            <input type="date" bind:value={checkOutDate} class="date-input" />
+            <p>{new Date(checkOutDate).toLocaleDateString()}</p>
+
         </div>
-        
+
         <div class="separator" id="three"></div>
 
         <div class="input" id="colPeple">
@@ -80,10 +101,33 @@
             <input type="number" bind:value={adults} placeholder="Введите количество" min="1" />
         </div>
     </form>
-    <button on:click={handleSubmit} > <p id="search" >Поиск</p></button>
+    <button on:click={handleSubmit}> <p id="search">Поиск</p></button>
 </main>
 
+
+{#if calendarIn}
+    <div class="calendar in" on:click={handleCalendarClick}>
+        <Calendar/>
+    </div>
+{/if}
+
+{#if calendarOut}
+    <div class="calendar out" on:click={handleCalendarClick}>
+        <Calendarcopy/>
+    </div>
+{/if}
 <style>
+
+    .calendar.in{
+        position: absolute;
+        left: 185px;
+    }
+
+    .calendar.out{
+        position: absolute;
+        left: 370px;
+        box-shadow: 0 0 3px red;
+    }
 
     button{
         border-radius: 15px;
@@ -113,8 +157,14 @@
     }
 
     .input {
-        position: relative;
+        position: static;
         padding: 15px 80px 15px 20px;
+    }
+
+    .input p{
+        font-size: 15px;
+        font-weight: 300;
+
     }
 
     .input,

@@ -80,7 +80,7 @@ class ObjectView(CRUDViewSet):
         'retrieve': (AllowAny,),
         'delete': (custom_permissions.IsOwnerOfObject | custom_permissions.IsAdmin, custom_permissions.EmailIsActivate),
         'add_to_favorites': (IsAuthenticated,),
-        'remove_to_favorites': (IsAuthenticated,),
+        'remove_from_favorites': (IsAuthenticated,),
         'make_object_active': (custom_permissions.IsAdmin,),
         'make_object_inactive': (custom_permissions.IsAdmin,),
     }

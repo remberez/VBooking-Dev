@@ -1,5 +1,3 @@
-import pdb
-
 from rest_framework import serializers
 from booking.models.object import Object, IndependentObject, Room
 from booking.serializers.media import ImageObjectListSerializer, VideoObjectListSerializer

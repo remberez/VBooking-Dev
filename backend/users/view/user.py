@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from common.mixins.view_mixins import CRUDViewSet
+from common.mixins.view_mixins import CRUDViewSet, CUDViewSet
 from users.filters_backend.travelers import TravelersFilter
 from users.filters_backend.users import UserFilter
 from users.models.email_activate import EmailActivate
@@ -13,13 +13,12 @@ from users.serializers import user as user_serializers
 from rest_framework import permissions, status
 from common import permisions as custom_permissions
 from common.pagination import BasePagination
+from users.serializers.citizenship import CitizenshipSerializer
 from users.tasks import send_code
-from booking.serializers.objects import FavoritesObjectListSerializer
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from users.models.user import FellowTraveler
-from users.serializers import traveler as traveler_serializers
-
+from users.models.user import FellowTraveler, Citizenship
+from users.serializers.traveler import TravelerSerializer
 User = get_user_model()
 
 
@@ -57,7 +56,8 @@ User = get_user_model()
     ),
     activate_email=extend_schema(
         summary='Подтвердить код',
-        tags=['Пользователи: подтверждение почты']
+        tags=['Пользователи: подтверждение почты'],
+        request=user_serializers.ActivateEmailSerializer
     ),
     profile=extend_schema(
         summary='Информация о текущем пользователе (БЕЗ ID)',
@@ -166,7 +166,7 @@ class UserView(CRUDViewSet):
         serializer = user_serializers.ChangePasswordSerializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
 
-        request.user.set_password(serializer.data.get('new_password'))
+        request.user.set_password(serializer.validated_data.get('new_password'))
         request.user.save()
         return Response(status=status.HTTP_200_OK)
 
@@ -180,34 +180,20 @@ class UserView(CRUDViewSet):
         summary='Удаление попутчика',
         tags=['Пользователи: попутчики'],
     ),
-    list=extend_schema(
-        summary='Список попутчиков пользователя',
-        tags=['Пользователи: попутчики'],
-    ),
-    retrieve=extend_schema(
-        summary='Попутчик детально',
-        tags=['Пользователи: попутчики'],
-    ),
     partial_update=extend_schema(
         summary='Обновить попутчика',
         tags=['Пользователи: попутчики'],
     )
 )
-class TravelerView(CRUDViewSet):
+class TravelerView(CUDViewSet):
     queryset = FellowTraveler.objects.all()
     pagination_class = BasePagination
 
-    multi_serializer_class = {
-        'create': traveler_serializers.TravelerCreateSerializer,
-        'list': traveler_serializers.TravelerListSerializer,
-        'retrieve': traveler_serializers.TravelerDetailSerializer,
-        'partial_update': traveler_serializers.TravelerUpdateSerializer
-    }
+    serializer_class = TravelerSerializer
 
     multi_permission_classes = {
         'create': (permissions.IsAuthenticated,),
         'destroy': (permissions.IsAuthenticated,),
-        'list': (custom_permissions.IsAdmin,),
         'retrieve': (permissions.IsAuthenticated,),
         'partial_update': (permissions.IsAuthenticated,),
     }
@@ -224,3 +210,44 @@ class TravelerView(CRUDViewSet):
         if instance.user == self.request.user:
             return super().perform_destroy(instance)
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+@extend_schema_view(
+    create=extend_schema(
+        summary='Создать гражданство',
+        tags=['Гражданства'],
+    ),
+    list=extend_schema(
+        summary='Список гражданств',
+        tags=['Гражданства'],
+    ),
+    retrieve=extend_schema(
+        summary='Гражданство детально',
+        tags=['Гражданства'],
+    ),
+    partial_update=extend_schema(
+        summary='Обновить гражданство',
+        tags=['Гражданства'],
+    ),
+    destroy=extend_schema(
+        summary='Удалить гражданство',
+        tags=['Гражданства'],
+    )
+)
+class CitizenshipView(CRUDViewSet):
+    filter_backends = (
+        OrderingFilter,
+    )
+    ordering = ('id',)
+    pagination_class = BasePagination
+
+    queryset = Citizenship.objects.all()
+    serializer_class = CitizenshipSerializer
+
+    multi_permission_classes = {
+        'list': (AllowAny,),
+        'create': (custom_permissions.IsAdmin,),
+        'retrieve': (AllowAny,),
+        'destroy': (custom_permissions.IsAdmin,),
+        'partial_update': (custom_permissions.IsAdmin,),
+    }

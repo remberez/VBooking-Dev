@@ -39,8 +39,8 @@
       currentDate.subscribe(date => {
           selectedDateValue = new Date(date.getFullYear(), date.getMonth(), day);
           selectedDate.set(selectedDateValue);
-          dispatch('dateSelected', selectedDateValue); 
-          Cookies.set("in", selectedDateValue)
+          dispatch('dateSelected', selectedDateValue);
+          Cookies.set("out", selectedDateValue)
         })();
   }
 

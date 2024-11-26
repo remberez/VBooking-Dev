@@ -147,10 +147,12 @@ class Object(models.Model):
         :return: Вызывает исключение ValidationError или не возвращает ничего
         """
         def ranges_overlapping(start1: date, end1: date, start2: date, end2: date) -> bool:
-            if start1 <= end2 and start2 <= end1:
-                exclude_start, exclude_end = exclude
-                if not (start2 >= exclude_start and end2 <= exclude_end):
-                    return True
+            if start2 <= start1 <= end2 or start2 <= end1 <= end2:
+                if exclude:
+                    exclude_start, exclude_end = exclude
+                    if exclude_start <= start2 <= exclude_end and exclude_start <= end2 <= exclude_end:
+                        return False
+                return True
             return False
 
         if not self.is_independent:

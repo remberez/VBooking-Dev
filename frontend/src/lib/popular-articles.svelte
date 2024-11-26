@@ -3,7 +3,7 @@
 </script>
 
 <main>
-    <h1 class="animate__animated wow animate__fadeInUp">Полезные статьи</h1>
+    <h1 class="animate__animated wow ">Полезные статьи</h1>
 
     <section class="horizontal-scroll">
         <NewsBlock hrefs="https://www.wikihow.com/images/thumb/a/a2/Include-CSS-Within-HTML-Web-Pages-Step-6.jpg/aid4377690-v4-728px-Include-CSS-Within-HTML-Web-Pages-Step-6.jpg.webp"/>
@@ -12,7 +12,7 @@
         <NewsBlock hrefs="https://www.wikihow.com/images/thumb/a/a2/Include-CSS-Within-HTML-Web-Pages-Step-6.jpg/aid4377690-v4-728px-Include-CSS-Within-HTML-Web-Pages-Step-6.jpg.webp"/>
     </section>
 
-    <a class="animate__animated wow animate__fadeInUp" href="">Читать больше</a>
+    <a class="animate__animated wow " href="">Читать больше</a>
 </main>
 
 <style>
