@@ -1,0 +1,35 @@
+.totalCount {
+    color: rgb(132, 132, 132);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.orderingList {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 7px;
+}
+
+.orderingButton {
+    padding-inline: 12px;
+    padding-block: 5px;
+    font-weight: 400;
+    font-size: 13px;
+    border-radius: 10px;
+    transition: background-color 200ms;
+}
+
+.orderingButton:hover {
+    background-color: rgb(234, 239, 253);
+}
+
+.orderingButton.active {
+    background-color: rgb(228, 227, 255);
+}

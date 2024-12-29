@@ -1,3 +1,5 @@
+import time
+
 from django.db import IntegrityError
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -93,7 +95,8 @@ class ObjectView(CRUDViewSet):
     )
 
     filterset_class = ObjectFilterSet
-    ordering = ('id',)
+    ordering = ('-id',)
+    ordering_fields = ('min_price',)
 
     pagination_class = BasePagination
 

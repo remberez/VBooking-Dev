@@ -1,0 +1,119 @@
+.navbar_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo_wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.navbar {
+    padding-block: 10px;
+    position: sticky;
+    background-color: white;
+    z-index: 100;
+    top: 0;
+    transition: box-shadow 0.3s ease;
+}
+
+.sticky {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logo_name {
+    font-size: clamp(26px, 1.87vw, 30px);
+    font-weight: 500;
+    color: var(--blue-color);
+}
+
+.navbar_list {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+}
+
+.burger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+}
+
+.burgerLine {
+    width: 25px;
+    height: 3px;
+    background-color: var(--blue-color);
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+.active {
+    display: block;
+}
+
+.userProfile {
+    position: relative;
+}
+
+.userProfileButton {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: center;
+}
+
+.dropdownList {
+    position: absolute;
+    top: calc(100% + 35px);
+    background-color: white;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-block: 10px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 5px rgb(119, 119, 119);
+}
+
+.dropDownItem {
+    padding-inline: 20px;
+    padding-block: 10px;
+    transition: 300ms;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.dropDownItem:hover {
+    background-color: rgb(230, 230, 230);
+}
+
+@media (max-width: 1200px) {
+    .dropdownList {
+        left: 30%;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar_list {
+        display: none;
+        flex-direction: column;
+        position: absolute; 
+        top: 80px;
+        right: 10px;
+        background-color: white;
+        z-index: 10;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    .navbar_list.active {
+        display: flex; /* Показывать список, когда он активен */
+    }
+
+    .burger {
+        display: flex; /* Показать бургер на мобильных устройствах */
+    }
+}

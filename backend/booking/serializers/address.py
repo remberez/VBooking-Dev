@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from booking.models.address import ExactAddress, Address
+from booking.serializers.city import CitySerializer
 
 
 class ExactAddressCreateSerializer(serializers.ModelSerializer):
@@ -32,6 +33,8 @@ class AddressCreateSerializer(serializers.ModelSerializer):
 
 
 class AddressObjectListSerializer(serializers.ModelSerializer):
+    city = CitySerializer()
+
     class Meta:
         model = Address
         fields = (

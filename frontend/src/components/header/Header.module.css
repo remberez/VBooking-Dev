@@ -1,0 +1,12 @@
+.header {
+    background-image: url(../../images/header-background.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding-block: clamp(150px, 17.5vw, 336px) clamp(100px, 9.9vw, 191px);
+}
+
+.headerTitle {
+    color: white;
+    text-align: center;
+}

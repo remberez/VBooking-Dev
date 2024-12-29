@@ -64,17 +64,5 @@ services:
     depends_on:
       - redis
     container_name: celery
-  svelte:
-    build:
-      context: frontend/
-    container_name: svelte
-    ports:
-      - "5173:5173"
-    depends_on:
-      - django
-    volumes:
-      - ./frontend:/usr/src/app/frontend
-      - /usr/src/app/frontend/node_modules
-    command: npm run dev
 volumes:
   pgdbdata: null

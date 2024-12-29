@@ -1,0 +1,28 @@
+.button {
+    background-color: var(--blue-color);
+    color: white;
+    padding-inline: 13px;
+    padding-block: 8px;
+    border-radius: 5px;
+    transition: all 400ms;
+}
+
+.button:hover {
+    background-color: var(--dark-blue-color);
+}
+
+.white {
+    background-color: white;
+    color: black;
+    border: 1px var(--gray-color) solid;
+}
+
+.white:hover {
+    background-color: var(--blue-color);
+    color: white;
+    border: 1px var(--blue-color) solid;
+}
+
+.blue {
+    background-color: var(--blue-color);
+}

@@ -1,0 +1,9 @@
+.counterWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px rgb(213, 213, 213) solid;
+    column-gap: 20px;
+    padding: 10px;
+}

@@ -1,0 +1,30 @@
+.notFoundContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 92vh;
+    background-image: linear-gradient(0deg, rgba(0,0,0,0.49611563375350143) 52%, rgba(255,255,255,0) 100%), url("../../images/notFoundBack.png");
+    background-repeat: no-repeat;
+    background-position:center;
+    background-size: cover;
+    color: #333;
+  }
+  
+  .svg404 {
+    margin-top: -200px;
+    height: auto;
+    width: 100%;
+  }
+  
+  .digit path {
+    stroke: #ffffff;
+    stroke-width: 1;
+    fill: none;
+  }
+  
+  .message {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-top: -20px;
+  }

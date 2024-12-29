@@ -1,18 +1,10 @@
 import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [svelte()],
   server: {
-        watch: {
-            usePolling: true,
-        },
-        host: true, // needed for the DC port mapping to work
-        strictPort: true,
-        port: 5173,
-        hmr: {
-            host: 'localhost',
-        },
-    }
+    host: true
+  },
+  plugins: [react()],
 })

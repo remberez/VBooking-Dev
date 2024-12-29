@@ -1,0 +1,33 @@
+.prevArrow::before, .nextArrow::before {
+    color: black;
+    display: inline-block; 
+    z-index: 1000;
+}
+
+.prevArrow::before {
+    content: url("../../images/left-arrow-carousel.svg");
+}
+
+.nextArrow::before {
+    content: url("../../images/right-arrow-carousel.svg");
+}
+  
+.prevArrow {
+    position: absolute;
+    left: calc(100% - 100px);
+    top: -45px;
+    opacity: 1;
+    transform: translateY(-50%);
+}
+
+.nextArrow {
+    position: absolute;
+    right: 30px;
+    top: -45px;
+    transform: translateY(-50%);
+    opacity: 1;
+}
+
+.title {
+    margin-bottom: 20px;
+}

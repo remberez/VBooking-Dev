@@ -1,0 +1,12 @@
+.title {
+    margin-bottom: 20px;
+}
+
+.moreLink {
+    margin-top: 20px;
+    display: block;
+    max-width: 300px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 400;
+}

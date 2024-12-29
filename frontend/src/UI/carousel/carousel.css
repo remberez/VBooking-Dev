@@ -1,0 +1,22 @@
+
+/* Убедитесь, что родительский контейнер слайдов (slick-track) использует flexbox */
+.bigSlider .slick-track {
+  display: flex !important;
+  justify-content: start !important;
+  gap: 20px ;
+  margin-left: -20px;
+  width: auto !important;
+}
+
+/* Настройка для того, чтобы слайды не прилипали при маленьких экранах */
+@media screen and (max-width: 1024px) {
+  .bigSlider.slick-slide {
+    margin-right: 10px; /* Уменьшаем отступы для небольших экранов */
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .bigSlider .slick-slide {
+    margin-right: 8px; /* Еще меньше отступы для маленьких экранов */
+  }
+}

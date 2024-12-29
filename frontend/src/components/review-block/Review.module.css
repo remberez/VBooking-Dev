@@ -1,0 +1,66 @@
+.reviewBlock {
+    box-shadow: 0 4px 8px 4px rgba(0,0,0,.06);
+    padding: 20px;
+    border-radius: 10px;
+    transition: box-shadow 300ms;
+}
+
+.reviewBlock:hover {
+    box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.179);
+}
+
+.objectName {
+    white-space: nowrap;     /* Запрещаем перенос текста на новую строку */
+    overflow: hidden;        /* Скрываем текст, который выходит за пределы блока */
+    text-overflow: ellipsis;
+    font-size: 16px;
+    color: var(--blue-color);
+    margin-bottom: 8px;
+}
+
+.profile {
+    display: flex;
+    justify-content:start;
+    gap: 10px;
+    font-size: 16px;
+    color: #2a2536;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profileImage {
+    border-radius: 50%;
+    background-color: cadetblue;
+    aspect-ratio: 1;
+    height: 48px;
+    padding-top: 15px;
+    color: white;
+    text-align: center;
+}
+
+.profileCity {
+    color: #6a6d81;
+}
+
+.relaxDate {
+    font-size: 14px;
+    color: #6a6d81;
+}
+
+.reviewContent {
+    font-size: 16px;
+    max-height: 140px;
+}
+
+.toggleButton {
+    color: #1e96fd;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.grade {
+    display: flex;
+    justify-content: start;
+    gap: 5px;
+    margin-top: 50px;
+}

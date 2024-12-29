@@ -1,0 +1,60 @@
+.slick-dots li {
+    margin: 0 2px; /* Расстояние между точками */
+}
+
+.slick-slider {
+    position: relative;
+}
+
+.slick-dots li button::before {
+    font-size: 7px;
+    border-radius: 50%; /* Круглая форма */
+    color: #ffffff; /* Цвет точки */
+    opacity: 0.7; /* Убедитесь, что точки видимы */
+}
+
+.slick-dots li.slick-active button::before {
+    font-size: 12px;
+    color: white;
+    opacity: 1;
+}
+
+.slick-next {
+    position: absolute;
+    top: 50%;
+    right: 25px;
+}
+
+.slick-prev {
+    top: 50%;
+    left: 15px;
+    z-index: 22;
+}
+
+.slick-prev:before { 
+    content: url("../../images/shevron-left.svg");
+}
+
+.slick-next:before { 
+    content: url("../../images/shevron.svg");
+}
+
+.slick-prev:before, .slick-next:before  {
+    opacity: 1;
+}
+
+
+.slick-arrow {
+    cursor: pointer; /* Указатель при наведении */
+    opacity: 0; /* Скрыть стрелки по умолчанию */
+    transition: opacity 0.3s ease; /* Плавный переход */
+}
+
+.slick-arrow.visible {
+    opacity: 1; /* Показать стрелки при наведении */
+}
+
+/* Убираем обводку для всех кнопок внутри слайдера */
+.slick-slide div {
+    outline: none;
+}

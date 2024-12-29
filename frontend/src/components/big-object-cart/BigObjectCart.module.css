@@ -1,0 +1,134 @@
+.object {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    justify-items: start;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgb(210, 210, 210);
+}
+
+.object:hover {
+    box-shadow: 0px 0px 10px rgb(210, 210, 210);
+}
+
+.image {
+    min-width: 260px;
+    height: 240px;
+    object-fit:cover;
+    border-radius: 10px;
+}
+
+.information {
+    padding: 23px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 400;
+    text-transform: capitalize;
+    margin-bottom: 13px;
+}
+
+.address {
+    font-size: 14px;
+    font-weight: 300;
+    color: #989898;
+}
+
+.seaDistance {
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.tagsList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    margin-bottom: 13px;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.tagImage {
+    object-fit: contain;
+    width: 15px;
+    height: 15px;
+}
+
+.tagName {
+    font-size: 14px;
+}
+
+.ratingWrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rating {
+    background-color: #00C12A;
+    color: white;
+    border-radius: 10px;
+    padding: 3px 10px;
+}
+
+.priceSide {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-left: 1px rgb(213, 213, 213) solid;
+    margin: 20px;
+    padding-left: 10px;
+    min-width: 150px;
+}
+
+.favorites {
+    padding: 23px 0;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.priceDesc {
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.link {
+    text-align: center;
+}
+
+.slider {
+    max-width: 260px;
+}
+
+.favoriteButton.active {
+    background-color: red;
+}
+
+.heartIcon path {
+    transition: stroke 0.3s ease, transform 0.1s ease; /* Плавный переход для обводки и трансформации */
+    fill: none; /* Без заливки */
+    stroke-width: 1; /* Ширина обводки */
+}
+
+.heartIcon:hover path {
+    stroke: red; /* Красная обводка при наведении */
+}
+
+.heartIcon:active path {
+    fill: red;
+}
+
+.heart-icon.scale {
+    transform: scale(1.1); /* Увеличение размера при нажатии */
+}

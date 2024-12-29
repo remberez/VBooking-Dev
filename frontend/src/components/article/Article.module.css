@@ -1,0 +1,22 @@
+.article {
+    border-radius: 10px;
+    box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 400;
+    white-space: normal;
+    padding-inline: 10px;
+}
+
+.subtitle {
+    font-weight: 300;
+    font-size: 14px;
+    margin-top: 12px;
+    white-space: normal;
+    overflow-wrap: break-word; 
+    padding-inline: 10px;
+    padding-bottom: 10px;
+}

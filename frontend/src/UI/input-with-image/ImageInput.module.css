@@ -1,0 +1,40 @@
+.input {
+    border-radius: 5px;
+    border: 1px var(--gray-color) solid;
+    padding: 10px;
+    font-size: 18px;
+    padding-left: 70px;
+    padding-block: 15px;
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.inputWrapper::before {
+    content: "";
+    position: absolute;
+    height: 60%;
+    width: 1px;
+    top: 20%;
+    left: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.userImage, .userImage:-webkit-autofill {
+    background: url("../../images/useIcon.png") no-repeat 12px 50%;
+    background-size: auto 50%;
+    opacity: 0.7;
+    -webkit-box-shadow: none !important;
+}
+
+.lockImage, .lockImage:-webkit-autofill   {
+    background: url("../../images/lock.png") no-repeat 10px 50%;
+    background-size: auto 60%;
+    opacity: 0.7;
+    -webkit-box-shadow: none !important;
+}
+
+.input {
+    background-color: transparent; /* Убедитесь, что фон остается при фокусе */
+}

@@ -1,0 +1,11 @@
+.calendarWrapper {
+    position: relative;
+}
+
+.calendar {
+    position: absolute;
+    top: calc(100% + 10px);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 10;
+}

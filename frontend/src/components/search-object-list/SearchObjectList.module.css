@@ -1,0 +1,37 @@
+.objectsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notFound {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.notFoundTitle {
+    font-size: 22px;
+}
+
+.notFoundDesc {
+    font-size: 16px;
+    width: 50%;
+    text-align: center;
+}
+
+.cat {
+    margin-top: -100px !important;
+    background-color: transparent !important;
+}
+
+.catWrapper {
+    width: 150px;
+    height: 150px;
+}
+
+@media (max-width: 1000px) { 
+}

@@ -8,6 +8,7 @@ from rest_framework import exceptions
 from booking.serializers.address import AddressCreateSerializer, ExactAddressCreateSerializer, \
     AddressObjectListSerializer
 from booking.serializers.tags import TagSerializer
+from booking.serializers.city import CitySerializer
 
 
 class IndependentObjectCreateSerializer(serializers.ModelSerializer):

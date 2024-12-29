@@ -1,0 +1,26 @@
+.image {
+    width: 280px;
+    height: 180px;
+    background-color: rgb(212, 212, 212);
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.itemTitle {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.carousel {
+    margin-top: 70px;
+    margin-bottom: 70px;
+}
+
+.subtitle {
+    color: #6a6d81;
+    margin-top: 7px;
+}
+
+.button {
+    text-align: start;
+}

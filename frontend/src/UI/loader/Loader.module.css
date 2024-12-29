@@ -1,0 +1,21 @@
+/* Loader.css */
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* Высота контейнера */
+}
+
+.spinner {
+    border: 8px solid rgba(255, 255, 255, 0.3); /* Цвет фона */
+    border-top: 8px solid #3498db; /* Цвет верхней части */
+    border-radius: 50%;
+    width: 40px; /* Ширина спиннера */
+    height: 40px; /* Высота спиннера */
+    animation: spin 500ms linear infinite; /* Анимация вращения */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

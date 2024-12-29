@@ -179,11 +179,14 @@ AUTH_USER_MODEL = 'users.User'
 MEDIA_ROOT = 'media'
 MEDIA_URL = 'media/'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4173",
-    "http://localhost:5173",
-    "http://192.168.0.102:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:4173",
+#     "http://localhost:5173",
+#     "http://192.168.0.102:5173",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465

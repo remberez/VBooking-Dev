@@ -1,0 +1,25 @@
+.menu {
+    position: absolute;
+    max-height: 0;               /* Начальная высота: 0 */
+    overflow: hidden;            /* Скрывает содержимое, когда max-height равно 0 */
+    opacity: 0;                  /* Начальная прозрачность: 0 */
+    transition: max-height 0.3s ease, opacity 0.3s ease; /* Плавный переход */
+}
+
+.item {
+    opacity: 0;
+    transform: translateY(-10px); /* Сдвиг для эффекта появления */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Плавный переход */
+}
+
+/* Активное состояние для меню */
+.active {
+    max-height: 100px;      /* Установите максимальную высоту для видимого состояния */
+    opacity: 1;             /* Полная прозрачность */
+}
+
+/* Активное состояние для дочерних элементов */
+.visible {
+    opacity: 1; /* Полная прозрачность */
+    transform: translateY(0); /* Вернуть на место */
+}

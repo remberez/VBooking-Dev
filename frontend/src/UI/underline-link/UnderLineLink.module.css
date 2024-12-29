@@ -1,0 +1,13 @@
+.link {
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0% calc(100%);
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size .3s;
+    padding-bottom: 4px;
+}
+
+.link:hover {
+    background-size: 100% 2px;
+}

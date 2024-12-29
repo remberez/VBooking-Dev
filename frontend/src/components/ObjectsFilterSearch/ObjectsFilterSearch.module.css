@@ -1,0 +1,22 @@
+.listWrapper {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    column-gap: 20px;
+    width: 100%;
+}
+
+.objectsWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    row-gap: 20px;
+}
+
+.moreButton {
+    display: inline;
+    padding-inline: 5px;
+    padding-block: 15px;
+    width: 25%;
+    margin-bottom: 20px;
+}

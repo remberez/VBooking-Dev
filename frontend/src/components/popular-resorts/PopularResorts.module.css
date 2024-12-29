@@ -1,0 +1,64 @@
+.cityImage {
+    width: 382px;
+    height: 223px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.popularResorts {
+    padding-block: 70px;
+}
+
+.cityItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cityList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 0 auto;
+}
+
+.title {
+    margin-bottom: 20px;
+}
+
+.cityName {
+    font-size: 22px;
+    font-weight: 400;
+    color: black;
+    margin-top: 10px;
+}
+
+.cityName:active {
+    color: var(--blue-color);
+}
+
+.imageContainer {
+    position: relative;
+    border-radius: 10px;
+}
+
+.gradientOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+    pointer-events: none;
+    border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+    .cityList {
+        grid-template-columns: 1fr;;
+    }
+
+    .title {
+        text-align: center;
+    }
+}
