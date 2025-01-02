@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from booking.models.object import Object, IndependentObject, Room
+from booking.models.object import Object, IndependentObject, Room, Favorite
 from booking.serializers.media import ImageObjectListSerializer, VideoObjectListSerializer
 from booking.serializers.type import TypeOfObjectSerializer
 from common.mixins.serializer_mixins import CommonMixin
@@ -9,6 +9,7 @@ from booking.serializers.address import AddressCreateSerializer, ExactAddressCre
     AddressObjectListSerializer
 from booking.serializers.tags import TagSerializer
 from booking.serializers.city import CitySerializer
+from rest_framework.fields import CurrentUserDefault
 
 
 class IndependentObjectCreateSerializer(serializers.ModelSerializer):
@@ -113,11 +114,12 @@ class ObjectCreateSerializer(ObjectValidate, serializers.ModelSerializer):
 
 class ObjectListSerializer(serializers.ModelSerializer):
     address = AddressObjectListSerializer()
-    min_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    min_price = serializers.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     images = ImageObjectListSerializer(many=True)
     tags = TagSerializer(many=True)
     videos = VideoObjectListSerializer(many=True)
     type = TypeOfObjectSerializer()
+    in_favorites = serializers.BooleanField(default=False)
 
     class Meta:
         fields = (
@@ -131,6 +133,7 @@ class ObjectListSerializer(serializers.ModelSerializer):
             'updated_at',
             'videos',
             'tags',
+            'in_favorites',
         )
         model = Object
 
@@ -171,6 +174,17 @@ class FavoritesObjectListSerializer(serializers.ModelSerializer):
             'videos',
             'tags',
         )
+
+
+class AddObjectToFavorite(serializers.Serializer):
+    date_start = serializers.DateField()
+    date_end = serializers.DateField()
+    user = serializers.HiddenField(default=CurrentUserDefault())
+
+    def validate(self, attrs):
+        if attrs['date_start'] > attrs['date_end']:
+            raise serializers.ValidationError("date_start must be before date_end.")
+        return attrs
 
 
 class ObjectDetailSerializer(serializers.ModelSerializer):
@@ -231,3 +245,21 @@ class ObjectDetailSerializer(serializers.ModelSerializer):
         else:
             representation['rooms'] = self.RoomsSerializer(instance.rooms.all(), many=True).data
         return representation
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    object = serializers.PrimaryKeyRelatedField(queryset=Object.objects.all())
+
+    class Meta:
+        model = Favorite
+        fields = ["id", "object", "date_start", "date_end", "user"]
+        read_only_fields = ["user", "id"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['object'] = ObjectListSerializer(instance.object).data
+        return representation
+    
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)

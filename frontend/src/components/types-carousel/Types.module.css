@@ -8,8 +8,9 @@
 }
 
 .typeItem {
-    font-size: 20px;
+    font-size: 16px;
     padding-bottom: 10px;
+    text-transform: capitalize;
 }
 
 .typeItem.active {

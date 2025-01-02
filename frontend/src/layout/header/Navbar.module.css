@@ -72,17 +72,21 @@
     left: 50%;
     transform: translateX(-50%);
     padding-block: 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 1px 1px 5px rgb(119, 119, 119);
+    width: max-content;
 }
 
 .dropDownItem {
     padding-inline: 20px;
     padding-block: 10px;
     transition: 300ms;
-    display: block;
+    display: flex;
+    align-items: start;
+    gap: 10px    ;
     width: 100%;
     cursor: pointer;
+    text-align: left;
 }
 
 .dropDownItem:hover {

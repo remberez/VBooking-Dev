@@ -1,0 +1,5 @@
+.map {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px rgb(213, 213, 213) solid;
+}

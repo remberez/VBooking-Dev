@@ -10,21 +10,60 @@
     background-size: cover;
     color: #333;
   }
-  
-  .svg404 {
-    margin-top: -200px;
-    height: auto;
-    width: 100%;
-  }
-  
-  .digit path {
-    stroke: #ffffff;
-    stroke-width: 1;
-    fill: none;
+
+  .digit {
+    width: 500px;
+    color: white;
+    font-family: monospace;
+    font-size: 300px;
+    white-space: nowrap; /* не переносить текст на другую строку */
+    overflow: hidden; /* скрываем переполнение контентом */
+    border-right: 3px solid white; /* рисуем курсор */
+    animation: cursor 0.75s step-end infinite, printed_text 500ms steps(3) forwards, borderEffect 1s forwards; /* добавлено borderEffect */
+    line-height: 0.9;
   }
   
   .message {
+    width: 305px;
     font-size: 1.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0;
     color: #ffffff;
-    margin-top: -20px;
+    animation: cursor 0.75s step-end infinite, printed_text 2s steps(18) forwards; /* добавлено forwards */
+    animation-delay: 500ms;
   }
+  
+  /* Анимация для border-right */
+  @keyframes borderEffect {
+    0%, 99% {
+      border-right: 3px solid white; /* курсор видим */
+    }
+    100% {
+      border-right: none; /* Убираем курсор в конце */
+    }
+  }
+  
+  @keyframes cursor {
+    0% {
+      border-right: 3px solid white;
+    }
+  
+    50% {
+      border-color: transparent; /* Курсор мигает */
+    }
+  
+    100% {
+      border-color: white;
+    }
+  }
+  
+  @keyframes printed_text {
+    from {
+      width: 0;
+    }
+  }
+
+.message.visible {
+  opacity: 1;
+}

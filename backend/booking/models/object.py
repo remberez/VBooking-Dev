@@ -3,7 +3,7 @@ from typing import List, TypeVar, Optional, Tuple, Union, Dict
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, Case, When, F, Max, Min, QuerySet
+from django.db.models import Q, Case, When, F, Max, Min, QuerySet, DecimalField
 from booking.models.tags import Tag
 
 Object_type = TypeVar('Object_type', bound='Object')
@@ -45,9 +45,6 @@ class Object(models.Model):
     type = models.ForeignKey(
         'TypeOfObject', verbose_name='Тип', on_delete=models.SET_DEFAULT,
         related_name='objects_of_type', default=0,
-    )
-    user_favorites = models.ManyToManyField(
-        'users.User', related_name='favorites_objects'
     )
 
     class Meta:
@@ -120,6 +117,41 @@ class Object(models.Model):
                 output_field=models.DecimalField(),
             )
         )
+    
+    @staticmethod
+    def annotate_favorites(queryset: QuerySet[Object_type], user_id: int):
+        favorites_subquery = Favorite.objects.filter(
+            object_id=models.OuterRef('id'),
+            user_id=user_id
+        )
+        
+        return queryset.annotate(
+            in_favorites=models.Exists(favorites_subquery)
+        )
+    
+    @staticmethod
+    def annotate_price_individually(queryset: QuerySet[Object_type]):
+        """
+        У каждого элемента QuerySet должно быть аннотированны поля first_day и last_day,
+        так как в отличии от annotate_price цена будет аннотироваться основываясь не на 
+        передаваемых параметрах, а на аннотированных полях, что будет формировать ценник
+        под индивдуальную дату объекта.
+        """        
+        qs = queryset.annotate(
+            min_price=Case(
+                When(independent__isnull=False, then=Min('independent__price_list__price',
+                    filter=Q(independent__price_list__first_day__lte=F('first_day')) &
+                        Q(independent__price_list__last_day__gte=F('last_day'))
+                )),
+                When(independent__isnull=True, then=Min('rooms__price_list__price',
+                    filter=Q(rooms__price_list__first_day__lte=F('first_day')) &
+                        Q(rooms__price_list__last_day__gte=F('last_day'))
+                )),
+                output_field=DecimalField(),
+            )
+        )
+
+        return qs
 
     @property
     def is_independent(self) -> bool:
@@ -174,6 +206,23 @@ class Object(models.Model):
                         f"Промежуток {first_day} - {last_day} пересекается с датами "
                         f"{price_list.first_day} - {price_list.last_day} для объекта {self}."
                     )
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="favorites")
+    object = models.ForeignKey("Object", on_delete=models.CASCADE, related_name="in_favorites_users")
+    date_start = models.DateField(null=True, blank=True)
+    date_end = models.DateField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Избранный"
+        verbose_name_plural = "Избранные"
+        unique_together = ('user', 'object')
+
+    def clean(self):
+        super().clean()
+        if (self.date_start is None) != (self.date_end is None):
+            raise ValidationError("Both date_start and date_end must be either filled or null.")
 
 
 class BaseRoom(models.Model):

@@ -12,11 +12,12 @@ from common.mixins.view_mixins import CRUDViewSet
 from common.pagination import BasePagination
 from booking.serializers import objects as object_serializers
 from common import permisions as custom_permissions
-from booking.models.object import Object
+from booking.models.object import Object, Favorite
 from booking.serializers import media as media_serializers
 from booking.filter_backends.object_filters import ObjectFilterSet, ObjectFilter
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework import viewsets
+from django.db.models import OuterRef, Subquery
 
 @extend_schema_view(
     create=extend_schema(
@@ -62,6 +63,10 @@ from rest_framework.permissions import IsAuthenticated
     make_object_inactive=extend_schema(
         summary="Сделать объект неактивным",
         tags=["Администрирование"],
+    ),
+    get_my_favorites=extend_schema(
+        summary="Получить избранные пользователя",
+        tags=["Объекты"],
     )
 )
 class ObjectView(CRUDViewSet):
@@ -81,8 +86,6 @@ class ObjectView(CRUDViewSet):
         'list': (AllowAny,),
         'retrieve': (AllowAny,),
         'delete': (custom_permissions.IsOwnerOfObject | custom_permissions.IsAdmin, custom_permissions.EmailIsActivate),
-        'add_to_favorites': (IsAuthenticated,),
-        'remove_from_favorites': (IsAuthenticated,),
         'make_object_active': (custom_permissions.IsAdmin,),
         'make_object_inactive': (custom_permissions.IsAdmin,),
     }
@@ -122,31 +125,6 @@ class ObjectView(CRUDViewSet):
     @action(
         detail=True, methods=['get']
     )
-    def add_to_favorites(self, request, *args, **kwargs):
-        obj = self.get_object()
-
-        if obj is None:
-            return Response(status=status.HTTP_404_NOT_FOUND, data='Объект не найден')
-        try:
-            request.user.favorites_objects.add(obj)
-        except IntegrityError:
-            return Response(status=status.HTTP_208_ALREADY_REPORTED, data='Объект уже находится в избранном')
-        return Response(status=status.HTTP_201_CREATED)
-
-    @action(
-        detail=True, methods=['get']
-    )
-    def remove_from_favorites(self, request, *args, **kwargs):
-        obj = self.get_object()
-
-        if obj is None:
-            return Response(status=status.HTTP_404_NOT_FOUND, data='Объект не найден')
-        request.user.favorites_objects.remove(obj)
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        detail=True, methods=['get']
-    )
     def make_object_active(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.is_active = True
@@ -161,3 +139,45 @@ class ObjectView(CRUDViewSet):
         instance.is_active = False
         instance.save()
         return Response(status=status.HTTP_200_OK)
+    
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = object_serializers.FavoriteSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "delete"]
+
+    def get_queryset(self):
+        favorites_qs = Favorite.objects.filter(user=self.request.user)
+
+        return Object.objects.filter(
+            id__in=self.queryset.values_list("object__id", flat=True)
+        ).annotate(
+            first_day=Subquery(favorites_qs.filter(object=OuterRef('id')).values_list('date_start', flat=True)),
+            last_day=Subquery(favorites_qs.filter(object=OuterRef('id')).values_list('date_end', flat=True))
+        )
+
+    def list(self, request, *args, **kwargs):
+        queryset = Object.annotate_price_individually(self.get_queryset())
+        serializer = object_serializers.ObjectListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print(request.data)
+
+        try:
+            serializer.save(user=request.user)
+        except IntegrityError:
+            return Response(status=status.HTTP_208_ALREADY_REPORTED)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def destroy(self, request, *args, **kwargs):
+        favorite = Favorite.objects.filter(
+            user=request.user,
+            object=kwargs["pk"]
+        ).first()
+        favorite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

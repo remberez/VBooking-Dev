@@ -34,19 +34,19 @@ class ObjectFilter(filters.BaseFilterBackend):
             'images',
             'videos',
         )
-        return Object.annotate_price(Object.annotate_people(queryset), first_day, last_day)
-
+        return Object.annotate_price(
+                        Object.annotate_people(queryset), first_day, last_day
+                    )
+    
     def list_filter(self, request, queryset, view):
         first_day = request.query_params.get('first_day')
         last_day = request.query_params.get('last_day')
         queryset = self.apply_date_filters(queryset, first_day, last_day)
-        return self.position_filter(request, queryset, view)
+        return Object.annotate_favorites(self.position_filter(request, queryset, view), request.user.id)
 
     def filter_queryset(self, request, queryset, view):
         backend_filters = {
             'list': self.list_filter,
-            'add_to_favorites': self.position_filter,
-            'remove_from_favorites': self.position_filter,
             'add_images_object': self.position_filter,
             'add_videos_object': self.position_filter,
             'partial_update': self.position_filter,

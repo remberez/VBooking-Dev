@@ -1,0 +1,66 @@
+[
+    {
+        "model": "booking.typeofobject",
+        "pk": 1,
+        "fields": {
+            "name": "квартира",
+            "is_independent": false
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 2,
+        "fields": {
+            "name": "дом",
+            "is_independent": true
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 3,
+        "fields": {
+            "name": "комната",
+            "is_independent": false
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 4,
+        "fields": {
+            "name": "хостел",
+            "is_independent": false
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 5,
+        "fields": {
+            "name": "отель",
+            "is_independent": false
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 6,
+        "fields": {
+            "name": "мини-гостиница",
+            "is_independent": false
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 7,
+        "fields": {
+            "name": "гостевой дом",
+            "is_independent": true
+        }
+    },
+    {
+        "model": "booking.typeofobject",
+        "pk": 8,
+        "fields": {
+            "name": "апарт-отель",
+            "is_independent": false
+        }
+    }
+]

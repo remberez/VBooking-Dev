@@ -9,6 +9,8 @@ import { observer } from 'mobx-react-lite';
 import DropDownList from '../../UI/drop-down-list-base/DropDownList';
 import downAroow from "../../images/shortDownArrow.png"
 import UnderLineLink from '../../UI/underline-link/UnderLineLink';
+import exitIcon from "../../images/exit.svg";
+import profileIcon from "../../images/profile.svg";
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,7 +68,7 @@ function Navbar() {
                     </div>
                     <ul className={`${classes.navbar_list} ${isMenuOpen ? classes.active : ''}`}>
                         <li><UnderLineLink to="/rent">Сдать жильё</UnderLineLink></li>
-                        <li><UnderLineLink to="/favorites">Избранное</UnderLineLink></li>
+                        <li><UnderLineLink to="/lc/favorites">Избранное</UnderLineLink></li>
                         <li className={classes.userProfile}>
                             {
                                 store.isAuth ?
@@ -78,8 +80,27 @@ function Navbar() {
                                         <img src={downAroow} width={10} height={10}/>
                                     </button> 
                                     <DropDownList menuClassName={classes.dropdownList} isActive={isOpenProfileMenu}>
-                                        <button className={classes.dropDownItem} onClick={menuLogoutHandler} type={"button"}>Выйти</button>
-                                        <Link className={classes.dropDownItem}>Профиль</Link>
+                                        <Link className={classes.dropDownItem} to={"lc/profile"} onClick={() => setIsOpenProfileMenu(false)}>
+                                            <img
+                                                src={profileIcon}
+                                                className={classes.profileIcon}
+                                                width={20}
+                                                height={20}
+                                            />
+                                            <span>
+                                                Личный кабинет
+                                            </span>
+                                        </Link>
+                                        <button className={classes.dropDownItem} onClick={menuLogoutHandler} type={"button"}>
+                                            <img 
+                                                src={exitIcon}
+                                                alt=""
+                                                className={classes.exitIcon}
+                                                width={20}
+                                                height={20}
+                                            />
+                                            <span>Выйти</span>
+                                        </button>
                                     </DropDownList>
                                 </>
                                 :

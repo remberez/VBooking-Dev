@@ -1,6 +1,8 @@
 import Calendar from "react-calendar";
 import useDropdown from "../../hooks/useDropDown";
 import classes from "./DateInput.module.css";
+import "./calendar.css";
+import CustomCalendar from "../calendar/CustomCalendar";
 
 function DateInput( { date, onDateSelect, inputName, children, className, containerClassName } ) {
     const { isActive, toggleDropdown, dropdownRef } = useDropdown();
@@ -23,10 +25,10 @@ function DateInput( { date, onDateSelect, inputName, children, className, contai
                 { children }
             </button>
             {isActive && (
-                <Calendar 
+                <CustomCalendar 
                     onChange={handleDateChange}
                     value={date}
-                    className={classes.calendar}
+                    className={`${classes.calendar} calendar`}
                 />
             )}
         </div>

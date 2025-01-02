@@ -18,7 +18,7 @@ function SearchHeader({
     setKidsCount,
 }) {
     return (
-        <header className={classNames(classes.header, "container")}>
+        <header className={classNames(classes.header)}>
             <div className={classes.headerBackground}>
                 <Title>
                     <h1 className={classes.title}>

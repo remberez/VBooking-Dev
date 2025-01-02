@@ -134,7 +134,12 @@ legend {
   position: fixed;
   width: 100%;
 }
+
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.container-disabled {
+  max-width: 100vw !important;
 }

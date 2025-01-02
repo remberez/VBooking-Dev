@@ -12,6 +12,7 @@ import ObjectService from "../../api/objectsService";
 import TypesOfObjectsCarousel from "../TypesOfObjectsCarousel/TypesOfObjectsCarousel";
 import { useLocation, useNavigate } from "react-router-dom";
 import ObjectsByTypesCarousel from "../ObjectsByTypesCarousel/ObjectsByTypesCarousel";
+import YandexMap from "../yandex-map/YandexMap";
 
 function ObjectsFilterSearch() {
     const [cityList, setCityList] = useCityList();
@@ -43,6 +44,8 @@ function ObjectsFilterSearch() {
         shouldReset,
     } = useInfiniteScroll(getObjects);
 
+    const [mapIsActive, setMapIsActive] = useState(false);
+
     async function onSubmit() {
         const initalPage = 1;
         shouldReset(async () => await getObjects(initalPage, 3), initalPage);
@@ -51,15 +54,15 @@ function ObjectsFilterSearch() {
 
     async function getObjects(page, pageSize) {
         const params = { 
-            city: selectedCity, 
-            first_day: dateStart, 
-            last_day: dateEnd, 
-            adults: adultsCount, 
-            kids: kidsCount, 
+            city: selectedCity || "", 
+            first_day: dateStart || "", 
+            last_day: dateEnd || "", 
+            adults: adultsCount || "", 
+            kids: kidsCount || "", 
             page: page, 
             page_size: pageSize, 
             ordering: selectedOrdering,
-            type: type,
+            type: type || "",
         }
         try {
             const response = await ObjectService.getObjects(params);
@@ -94,44 +97,60 @@ function ObjectsFilterSearch() {
 
     return (
         <>
-            <SearchHeader 
-                cityList={cityList}
-                onSubmit={onSubmit} 
-                dateStart={dateStart}
-                dateEnd={dateEnd}
-                selectedCity={selectedCity}
-                adultsCount={adultsCount}
-                kidsCount={kidsCount}
-                setDateStart={setDateStart}
-                setDateEnd={setDateEnd}
-                setSelectedCity={setSelectedCity}
-                setAdultsCount={setAdultsCount}
-                setKidsCount={setKidsCount}
-                updateQueryParams={updateQueryParams}
-            />
-            <div className={`${classes.listWrapper} container`}>
-                <ObjectFilter />
-                <div className={classes.objectsWrapper}>
-                    <OrderingObjects 
-                        totalCount={objectCount} 
-                        selectOrdering={selectedOrdering} 
-                        handleOrderingChange={setSelectedOrdering}
+            <div className="container">
+                <SearchHeader 
+                    cityList={cityList}
+                    onSubmit={onSubmit} 
+                    dateStart={dateStart}
+                    dateEnd={dateEnd}
+                    selectedCity={selectedCity}
+                    adultsCount={adultsCount}
+                    kidsCount={kidsCount}
+                    setDateStart={setDateStart}
+                    setDateEnd={setDateEnd}
+                    setSelectedCity={setSelectedCity}
+                    setAdultsCount={setAdultsCount}
+                    setKidsCount={setKidsCount}
+                    updateQueryParams={updateQueryParams}
+                />
+            </div>
+            <div className={`container ${mapIsActive ? "container-disabled" : ""}`}>
+                <div className={`${classes.listWrapper} ${mapIsActive ? classes.withThirdColumn : "" }`}>
+                    <ObjectFilter 
+                        turnContainer={setMapIsActive}
+                        containerIsActive={mapIsActive}
                     />
-                    <SearchObjectList 
-                        objectsList={objectsList} 
-                        loading={isLoading}
-                        bottomLoading={isFetchUp}
-                    />
+                    <div className={classes.objectsWrapper}>
+                        <OrderingObjects 
+                            totalCount={objectCount} 
+                            selectOrdering={selectedOrdering} 
+                            handleOrderingChange={setSelectedOrdering}
+                        />
+                        <SearchObjectList 
+                            objectsList={objectsList} 
+                            loading={isLoading}
+                            bottomLoading={isFetchUp}
+                            dateStart={dateStart}
+                            dateEnd={dateEnd}
+                        />
+                        {
+                            stillLeft > 0 &&
+                            <Button onClick={handleScroll} className={classes.moreButton}>
+                                Показать ещё {stillLeft} объектов
+                            </Button>
+                        }
+                    </div>
                     {
-                        stillLeft > 0 &&
-                        <Button onClick={handleScroll} className={classes.moreButton}>
-                            Показать ещё {stillLeft} объектов
-                        </Button>
+                        mapIsActive && <YandexMap objectsList={objectsList}/>
                     }
                 </div>
             </div>
-            <TypesOfObjectsCarousel clickHandle={onCategoryClick} />
-            <ObjectsByTypesCarousel city={selectedCity}/>
+            <div className="container">
+                <TypesOfObjectsCarousel clickHandle={onCategoryClick} />
+            </div>
+            <div className="container">
+                <ObjectsByTypesCarousel city={selectedCity}/>
+            </div>
         </> 
     )
 }

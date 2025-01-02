@@ -15,9 +15,13 @@ export default class Store {
         this.isAuth = bool;
     }
 
-    async setUser() {
+    setUser(userData) {
+        this.user = userData;
+    }
+
+    async fetchUser() {
         const response = await $api.get("users/profile/");
-        this.user = response.data;
+        return response.data;
     }
 
     async login(email, password) {
@@ -25,7 +29,8 @@ export default class Store {
             const response = await AuthService.login(email, password);
             localStorage.setItem('access', response.data.access);
             localStorage.setItem('refresh', response.data.refresh);
-            await this.setUser();
+            const userData = await this.fetchUser();
+            this.setUser(userData);
             this.setAuth(true);
             return response;
         } catch (e) {
@@ -37,10 +42,11 @@ export default class Store {
         try {
             const response = await axios.post(`${BACKEND_URL}/auth/jwt/refresh`, {refresh: localStorage.getItem('refresh')});
             localStorage.setItem('access', response.data.access);
-            this.isAuth = true;
-            this.setUser();
+            const userData = await this.fetchUser();
+            this.setAuth(true);
+            this.setUser(userData);
         } catch (e) {
-
+            console.log(e);
         }
     }
 
@@ -51,7 +57,7 @@ export default class Store {
             this.setAuth(false);
             this.user = {};
         } catch (e) {
-
+            console.log(e);
         }
     }
 }

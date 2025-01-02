@@ -98,14 +98,7 @@ class User(BaseUser, AbstractUser):
         return f'{self.surname} {self.name} {self.patronymic}'
 
     def get_favorites(self) -> QuerySet:
-        return self.favorites_objects.all().select_related(
-                'owner', 'address', 'type', 'independent', 'independent__exact_address', 'address__city'
-            ).prefetch_related(
-                'images',
-                'videos',
-                'independent__tags',
-                'rooms__tags',
-            )
+        return self.favorites.all()
 
 
 class FellowTraveler(BaseUser):

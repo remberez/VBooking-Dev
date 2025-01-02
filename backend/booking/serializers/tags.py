@@ -3,6 +3,8 @@ from booking.models.tags import Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
+    type = serializers.CharField()
+    
     class Meta:
         model = Tag
         fields = (

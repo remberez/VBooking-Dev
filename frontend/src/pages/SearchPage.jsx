@@ -4,10 +4,10 @@ import ReviewCarousel from "../components/review-carousel/ReviewCarousel";
 
 function SearchPage() {
     return (
-        <main className="container">
+        <>
             <ObjectsFilterSearch/>
             <ReviewCarousel/>
-        </main>
+        </>
     )
 }
 

@@ -42,4 +42,6 @@ class AddressObjectListSerializer(serializers.ModelSerializer):
             'street',
             'house',
             'sea_distance',
+            'latitude',
+            'longitude'
         )

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from booking.models.address import Address, ExactAddress, City
-from booking.models.object import Object, IndependentObject, Room, TypeOfObject
+from booking.models.object import Object, IndependentObject, Room, TypeOfObject, Favorite
 from booking.models.media import ObjectImage, ObjectVideo, RoomImage
 from booking.models.price_list import IndependentPriceList, PriceListOfRoom
 from booking.models.reviews import Review
@@ -99,3 +99,8 @@ class TagTypeAdmin(admin.ModelAdmin):
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'object')
+
+
+@admin.register(Favorite)
+class FavoriteObjects(admin.ModelAdmin):
+    list_display = ("user", "object", "date_start", "date_end")

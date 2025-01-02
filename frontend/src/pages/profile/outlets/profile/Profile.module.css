@@ -1,0 +1,117 @@
+.profile {
+    background-color: white;
+    border-radius: 5px;
+    padding: 25px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 30px;
+}
+
+.input {
+    width: 100%;
+    position: relative;
+}
+
+.baseInfoInputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.inputWrapper:last-child {
+    grid-column: span 2;
+}
+
+.firstRowPlaceholder {
+    color: rgb(130, 130, 130);
+    font-weight: 300;
+}
+
+.secondRowPlaceholder {
+    color: rgb(162, 162, 162);
+    font-weight: 400;
+}
+
+.contactInfoInputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* GenderSelect.module.css */
+.genderSelect {
+    display: grid;
+    margin: 20px 0;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.genderButton {
+    background-color: #f0f0f0; /* Цвет фона по умолчанию */
+    border: 1px solid #ccc; /* Граница */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px 20px; /* Отступы */
+    cursor: pointer; /* Курсор при наведении */
+    transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+}
+
+.genderButton:hover {
+    background-color: #e0e0e0; /* Цвет при наведении */
+}
+
+.active {
+    background-color: var(--blue-color); /* Цвет активной кнопки */
+    color: white; /* Цвет текста активной кнопки */
+    border-color: var(--blue-color); /* Цвет границы активной кнопки */
+}
+
+.saveButton {
+    margin-top: 15px;
+    width: 100%;
+    padding-block: 10px;
+}
+
+.avatar {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.circleAvatar {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.avatarDesc {
+    text-align: center;
+    max-width: 300px;
+    display: block;
+    font-weight: 300;
+}
+
+.avatarDesc.success {
+    color: var(--blue-color);
+    font-weight: 400;
+}
+
+.calendar {
+    position: absolute;
+    z-index: 100;
+}

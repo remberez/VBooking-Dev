@@ -1,0 +1,45 @@
+.calendar {
+    background-color: #ffffff; /* Цвет фона календаря */
+    border: 1px solid #ccc;    /* Цвет границы */
+    border-radius: 8px;        /* Скругление углов */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень */
+    padding: 1em;              /* Внутренний отступ */
+}
+
+/* Стили для дней */
+.react-calendar__tile {
+    padding: 10px;             /* Отступы для каждого дня */
+    border-radius: 5px;       /* Скругление углов для ячеек */
+    transition: background-color 0.3s; /* Плавный переход цвета */
+}
+
+/* Стили для активного дня */
+.react-calendar__tile--active {
+    background-color: var(--blue-color); /* Цвет фона для активного дня */
+    color: white;              /* Цвет текста для активного дня */
+}
+
+/* Стили для выделенного дня */
+.react-calendar__tile--hasActive {
+    background-color: #0056b3; /* Цвет фона для выделенного дня */
+    color: white;              /* Цвет текста для выделенного дня */
+}
+
+/* Стили для дня, когда курсор над ним */
+.react-calendar__tile:hover {
+    background-color: #f0f0f0; /* Цвет фона при наведении */
+}
+
+/* Стили для заголовка месяца */
+.react-calendar__navigation button {
+    background: none;         /* Убираем фоновый цвет */
+    border: none;            /* Убираем границу */
+    color: var(--blue-color);          /* Цвет текста */
+    font-weight: bold;       /* Жирный шрифт */
+    cursor: pointer;         /* Указатель курсора */
+}
+
+/* Стили для заголовка месяца */
+.react-calendar__month-view__weekdays {
+    font-weight: bold;       /* Жирный шрифт для дней недели */
+}

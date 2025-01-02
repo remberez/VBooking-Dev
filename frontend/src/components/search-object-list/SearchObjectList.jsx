@@ -4,8 +4,9 @@ import Loader from "../../UI/loader/Loader";
 import Title from "../title/Title";
 import Cat from "../../UI/cat-animation/Cat";
 import SocialBanner from "../social-banner/SocialBanner";
+import React from "react";
 
-function SearchObjectList({ objectsList, loading, bottomLoading }) {
+function SearchObjectList({ objectsList, loading, bottomLoading, dateStart, dateEnd }) {
     return (
         <section className={classes.objects}>
             { loading && objectsList.length < 1 ? (
@@ -16,16 +17,14 @@ function SearchObjectList({ objectsList, loading, bottomLoading }) {
                         <ul className={classes.objectsList}>
                             {objectsList.map((value, index) => {
                                 return (
-                                    <>
-                                        {
-                                            index === 5 && (
-                                                <SocialBanner className={classes.banner}/>
-                                            )
-                                        }
-                                        <li key={value.id}>
-                                            <BigObjectCart objectData={value} />
+                                    <React.Fragment key={value.id}>
+                                        {index === 5 && (
+                                            <SocialBanner className={classes.banner} />
+                                        )}
+                                        <li>
+                                            <BigObjectCart objectData={value} dateStart={dateStart} dateEnd={dateEnd} />
                                         </li>
-                                    </>
+                                    </React.Fragment>
                                 )
                                 }
                             )}

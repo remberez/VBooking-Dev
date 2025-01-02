@@ -1,6 +1,74 @@
 .filter {
     width: 100%;
-    border: 1px black solid;
-    height: 300px;
-    position: sticky;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px rgb(213, 213, 213) solid;
+}
+
+.tagsList {
+    margin-block: 10px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.map {
+    background: url("../../images/map.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 80px;
+    border-radius: 5px;
+}
+
+
+
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none; /* Запретить выделение текста */
+}
+
+.checkbox {
+    display: none; /* Скрываем стандартный чекбокс */
+}
+
+.checkmark {
+    height: 20px; /* Высота чекбокса */
+    width: 20px; /* Ширина чекбокса */
+    background-color: #eee; /* Фоновый цвет для чекбокса */
+    border: 1px rgb(213, 213, 213) solid;
+    border-radius: 3px; /* Закругленные углы */
+    margin-right: 7px; /* Отступ между чекбоксом и текстом */
+    position: relative;
+    transition: background-color 0.3s; /* Плавный переход цвета */
+}
+
+.checkbox:checked + .checkmark {
+    background-color: var(--blue-color); /* Цвет при выборе чекбокса */
+}
+
+.checkmark::after {
+    content: "";
+    position: absolute;
+    display: none; /* Скрываем галочку по умолчанию */
+}
+
+.checkbox:checked + .checkmark::after {
+    display: block; /* Показать галочку, когда чекбокс выбран */
+}
+
+.checkmark::after {
+    left: 7px; /* Положение галочки */
+    top: 4px; /* Положение галочки */
+    width: 5px; /* Ширина галочки */
+    height: 10px; /* Высота галочки */
+    border: solid white; /* Цвет галочки */
+    border-width: 0 2px 2px 0; /* Толщина галочки */
+    transform: rotate(45deg); /* Поворачиваем галочку */
 }
